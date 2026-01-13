@@ -1,3 +1,9 @@
+import Protected from "../../components/Protected";
+
 export default function LiveLeaderboard() {
-  return <h1>Live Leaderboard</h1>;
+  return (
+    <Protected>
+      <h1>Final Leaderboard</h1>
+    </Protected>
+  );
 }
