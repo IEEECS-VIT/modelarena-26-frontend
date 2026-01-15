@@ -18,7 +18,7 @@ export default function LandingPage() {
 
       <p>
         A competitive ML challenge platform where participants
-        submit models and climb the leaderboard.
+        submit models and climb the leaderboard. sneha
       </p>
 
       <br />
