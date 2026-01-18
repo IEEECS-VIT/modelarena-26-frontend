@@ -15,35 +15,31 @@
 //   );
 // }
 
-
 import Protected from "../../components/Protected";
 import Navbar from "../../components/Navbar";
 import DashboardSection from "../../components/DashboardSection";
+import TimelineSection from "../../components/TimelineSection";
 
 export default function HomePage() {
   return (
     <Protected>
       <Navbar />
 
-      {/* SCROLL CONTAINER */}
       <main className="h-screen overflow-y-auto scroll-smooth">
 
-        {/* HOME SECTION */}
-        <section
-          id="home"
-          className="min-h-screen p-10 flex flex-col gap-4"
-        >
-          <h1 className="text-3xl font-bold">
-            Welcome to ModelArena
-          </h1>
-
-          <p className="text-gray-400 max-w-xl">
+        {/* HOME */}
+        <section id="home" className="min-h-screen p-10">
+          <h1 className="text-3xl font-bold">Welcome to ModelArena</h1>
+          <p className="text-gray-400">
             Compete, submit models, and climb the leaderboard.
           </p>
         </section>
 
-        {/* DASHBOARD SECTION */}
+        {/* DASHBOARD */}
         <DashboardSection />
+
+        {/* TIMELINE */}
+        <TimelineSection />
 
       </main>
     </Protected>
