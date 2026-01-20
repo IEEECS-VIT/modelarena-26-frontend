@@ -1,39 +1,3 @@
-// "use client";
-
-// import { supabase } from "../lib/supabase";
-// import Navbar from "../components/Navbar";
-// import Protected from "@/components/Protected";
-
-// export default function LandingPage() {
-//   const signInWithGoogle = async () => {
-//     await supabase.auth.signInWithOAuth({
-//       provider: "google",
-//       options: {
-//         redirectTo: `${location.origin}/home`,
-//       },
-//     });
-//   };
-
-//   return (
-//     <Protected>
-//     <Navbar/>
-//     <main style={{ padding: "60px" }}>
-//       <h1>ModelArena</h1>
-
-//       <p>
-//         A competitive ML challenge platform where participants
-//         submit models and climb the leaderboard. okay
-//       </p>
-
-//       <br />
-
-//       <button onClick={signInWithGoogle}>
-//         Sign in with Google
-//       </button>
-//     </main>
-//     </Protected>
-//   );
-// }
 "use client";
 
 import { useEffect, useState } from "react";
@@ -42,6 +6,9 @@ import { supabase } from "../lib/supabase";
 import Navbar from "../components/Navbar";
 import DashboardSection from "../components/DashboardSection";
 import TimelineSection from "../components/TimelineSection";
+import FAQSection from "../components/FaqSection";
+import Footer from "../components/Footer";
+
 
 export default function LandingPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -76,8 +43,9 @@ export default function LandingPage() {
         {/* DASHBOARD (ONLY AFTER LOGIN) */}
         {isLoggedIn && <DashboardSection />}
 
-        {/* TIMELINE */}
         <TimelineSection />
+        <FAQSection />
+        <Footer />
       </main>
     </>
   );
