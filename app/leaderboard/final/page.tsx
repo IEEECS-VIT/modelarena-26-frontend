@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Protected from "../../../components/Protected";
 
 export default function LiveLeaderboard() {
   const [data, setData] = useState<any>(null);
@@ -16,11 +15,11 @@ export default function LiveLeaderboard() {
   }, []);
 
   return (
-    <Protected>
+    <>
       <h1>Live Leaderboard</h1>
 
       <pre>{JSON.stringify(data, null, 2)}</pre>
-    </Protected>
+    </>
   );
 }
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Protected from "../../components/Protected";
 
 export default function SubmitPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -39,8 +38,7 @@ export default function SubmitPage() {
   };
 
   return (
-    <Protected>
-      <h1>Submission Page</h1>
+    <>      <h1>Submission Page</h1>
 
       {/* File Input */}
       <input
@@ -57,6 +55,6 @@ export default function SubmitPage() {
       </button>
 
       <p>{message}</p>
-    </Protected>
+    </>
   );
 }
