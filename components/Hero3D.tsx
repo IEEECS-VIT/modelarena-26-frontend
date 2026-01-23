@@ -26,7 +26,7 @@ export default function Hero3D() {
       alpha: true,
     });
       // ensure the scene has no opaque background so the canvas stays transparent
-      // scene.background = null;
+      scene.background = null;
 
     // use filmic tone mapping and slightly lower exposure to reduce overall brightness
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
