@@ -29,37 +29,31 @@ export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section
-      id="faq"
-      className="min-h-screen bg-white p-12"
-    >
-      <h2 className="text-3xl font-semibold mb-8">FAQs</h2>
+    <section id="faq" className="min-h-screen bg-transparent p-12">
+      <div className="bg-overlay p-8 rounded-lg max-w-7xl mx-auto w-full text-white">
+        <h2 className="text-3xl font-semibold mb-8">FAQs</h2>
 
-      <div className="max-w-3xl space-y-4">
-        {faqs.map((faq, index) => (
-          <div
-            key={index}
-            className="border rounded-md"
-          >
-            <button
-              onClick={() =>
-                setOpenIndex(openIndex === index ? null : index)
-              }
-              className="w-full flex justify-between items-center p-4 text-left font-medium"
-            >
-              {faq.question}
-              <span>
-                {openIndex === index ? "−" : "+"}
-              </span>
-            </button>
+        <div className="max-w-3xl space-y-4">
+          {faqs.map((faq, index) => (
+            <div key={index} className="border border-white/20 rounded-md">
+              <button
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                className="w-full flex justify-between items-center p-4 text-left font-medium text-white"
+              >
+                {faq.question}
+                <span>
+                  {openIndex === index ? "−" : "+"}
+                </span>
+              </button>
 
-            {openIndex === index && (
-              <div className="p-4 pt-0 text-neutral-600">
-                {faq.answer}
-              </div>
-            )}
-          </div>
-        ))}
+              {openIndex === index && (
+                <div className="p-4 pt-0 text-white/70">
+                  {faq.answer}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -16,8 +16,9 @@ export default function DashboardSection() {
   const [showJoin, setShowJoin] = useState(false);
 
   return (
-    <section id="dashboard" className="min-h-screen p-12 bg-white">
-      <h2 className="text-3xl font-semibold mb-6">Dashboard</h2>
+    <section id="dashboard" className="min-h-screen p-12 bg-transparent">
+      <div className="bg-overlay p-8 rounded-lg max-w-7xl mx-auto">
+        <h2 className="text-3xl font-semibold mb-6 text-white">Dashboard</h2>
 
       {!hasTeam && (
         <div className="flex gap-4">
@@ -30,7 +31,7 @@ export default function DashboardSection() {
 
           <button
             onClick={() => setShowJoin(true)}
-            className="px-6 py-3 border rounded-md"
+            className="px-6 py-3 border border-white rounded-md text-white"
           >
             Join via Code
           </button>
@@ -81,6 +82,7 @@ export default function DashboardSection() {
           }}
         />
       )}
+      </div>
     </section>
     
   );

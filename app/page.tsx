@@ -45,8 +45,8 @@ export default function LandingPage() {
             
             {/* LEFT TEXT */}
             <div>
-              <h1 className="text-4xl font-bold">ModelArena</h1>
-              <h1 className="text-6xl font-extrabold tracking-wide">
+              <h1 className="text-4xl font-bold text-white">ModelArena</h1>
+              <h1 className="text-6xl font-extrabold tracking-wide text-white">
                 COMPUTE.<br />
                 <span className="text-[#CCFF00]">TRAIN.</span><br />
                 DEPLOY.
