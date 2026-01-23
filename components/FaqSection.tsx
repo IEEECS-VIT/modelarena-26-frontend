@@ -43,18 +43,50 @@ const faqs = [
 ];
 
 export default function FAQSection() {
-  const [activeIndex, setActiveIndex] = useState(0);
+  // null = no question selected yet
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const outputRef = useRef<HTMLParagraphElement | null>(null);
   const cmdRef = useRef<HTMLParagraphElement | null>(null);
   const typingTl = useRef<gsap.core.Tween | null>(null);
 
   // typing effect when activeIndex changes
+  const [currentFact, setCurrentFact] = useState<string>(
+    "Fact: Around 90% of the cost in ML projects comes from data collection and cleaning — good data matters more than fancy models."
+  );
+
+  const facts = [
+    "Fact: Around 90% of the cost in ML projects comes from data collection and cleaning — good data matters more than fancy models.",
+    "Fact: Data augmentation often improves model robustness more than increasing model size.",
+    "Fact: Transfer learning can drastically reduce training time and data requirements for many tasks.",
+    "Fact: Proper evaluation splits (validation/test) prevent overly optimistic performance estimates.",
+    "Fact: Feature quality usually beats adding more complex architectures — spend time on signals.",
+    "Fact: Model interpretability improves trust and debugging — simple, explainable models are often preferred in production.",
+    "Fact: Small, clean validation datasets can surface overfitting earlier than larger noisy sets.",
+    "Fact: Hyperparameter search yields diminishing returns past a point; invest in data and features first.",
+    "Fact: Monitoring data drift and model performance in production catches degradation early.",
+    "Fact: Model compression techniques (pruning, quantization) enable edge deployment with little accuracy loss.",
+  ];
+
+  const randomFact = () => facts[Math.floor(Math.random() * facts.length)];
+
+  // pick a random fact at first render
+  useEffect(() => {
+    setCurrentFact(randomFact());
+  }, []);
+
   useEffect(() => {
     const el = outputRef.current;
     if (!el) return;
 
     // kill previous tween
     typingTl.current?.kill();
+
+    // If no question selected, show the current random AI/ML fact
+    if (activeIndex === null) {
+      el.textContent = currentFact;
+      if (cmdRef.current) cmdRef.current.textContent = "";
+      return;
+    }
 
     const full = faqs[activeIndex].output;
 
@@ -63,9 +95,9 @@ export default function FAQSection() {
     // clear immediately
     el.textContent = "";
 
-  // duration proportional to length (faster)
-  // reduced per-character time so typing feels snappier
-  const duration = Math.max(0.4, full.length * 0.02);
+    // duration proportional to length (faster)
+    // reduced per-character time so typing feels snappier
+    const duration = Math.max(0.35, full.length * 0.018);
 
     typingTl.current = gsap.to(obj, {
       i: full.length,
@@ -77,19 +109,20 @@ export default function FAQSection() {
       },
     });
 
-    // animate command line flash
+    // animate command line flash and set command text
     if (cmdRef.current) {
+      cmdRef.current.textContent = `$ ${faqs[activeIndex].command}`;
       gsap.fromTo(
         cmdRef.current,
         { color: "#9be15d" },
-        { color: "#CCFF00", duration: 0.15, yoyo: true, repeat: 1 }
+        { color: "#CCFF00", duration: 0.12, yoyo: true, repeat: 1 }
       );
     }
 
     return () => {
       typingTl.current?.kill();
     };
-  }, [activeIndex]);
+  }, [activeIndex, currentFact]);
 
   return (
     <section
@@ -103,11 +136,28 @@ export default function FAQSection() {
 
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 md:[grid-template-columns:auto_1fr]">
         {/* LEFT: Command List */}
-  <div className="space-y-10 w-full md:max-w-xs">
+        <div
+          className="space-y-10 w-full md:max-w-xs"
+          onClick={(e) => {
+            // clicking empty area of the left column shows a new random fact
+            if (e.target === e.currentTarget) {
+              setActiveIndex(null);
+              setCurrentFact(randomFact());
+            }
+          }}
+        >
           {faqs.map((faq, index) => (
             <button
               key={index}
-              onClick={() => setActiveIndex(index)}
+              onClick={() => {
+                if (activeIndex === index) {
+                  // re-clicking the already active question shows a new random fact
+                  setActiveIndex(null);
+                  setCurrentFact(randomFact());
+                } else {
+                  setActiveIndex(index);
+                }
+              }}
               className={`group w-full border px-5 py-4 text-left font-mono text-sm transition
                 ${
                   activeIndex === index
@@ -139,7 +189,7 @@ export default function FAQSection() {
           {/* Terminal Body */}
           <div className="min-h-[260px] px-6 py-5 font-mono text-sm leading-relaxed">
             <p ref={cmdRef} className="mb-3 text-[#CCFF00]">
-              $ {faqs[activeIndex].command}
+              {activeIndex !== null ? `$ ${faqs[activeIndex].command}` : ""}
             </p>
             <p
               ref={outputRef}

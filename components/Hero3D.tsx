@@ -25,19 +25,13 @@ export default function Hero3D() {
       antialias: true,
       alpha: true,
     });
-      // ensure the scene has no opaque background so the canvas stays transparent
-      scene.background = null;
-
-    // use filmic tone mapping and slightly lower exposure to reduce overall brightness
+    
+    renderer.setClearColor(0x000000, 0);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.75;
     renderer.setPixelRatio(window.devicePixelRatio);
-      // keep canvas background transparent so the page background shows through
-      renderer.setClearColor(0x000000, 0);
 
-  containerRef.current.appendChild(renderer.domElement);
-  // ensure the canvas element stays visually transparent
-  renderer.domElement.style.background = "transparent";
+    containerRef.current.appendChild(renderer.domElement);
 
     // --- GROUPS ---
     const tiltWrapper = new THREE.Group();
@@ -156,26 +150,8 @@ export default function Hero3D() {
     };
 
     // --- POST ---
-    // Create an RGBA render target for the composer so postprocessing keeps alpha
-    const size = new THREE.Vector2();
-    renderer.getSize(size);
-    const renderTarget = new THREE.WebGLRenderTarget(size.x || 800, size.y || 600, {
-      format: THREE.RGBAFormat,
-      encoding: renderer.outputEncoding,
-      samples: Math.max(0, renderer.getContext()?.getParameter?.(renderer.getContext().SAMPLES) || 0),
-    });
-
-    const composer = new EffectComposer(renderer, renderTarget);
-    composer.renderToScreen = true;
-    composer.addPass(new RenderPass(scene, camera));
-    composer.addPass(
-      new UnrealBloomPass(
-        new THREE.Vector2(300, 300),
-        0.5, // lower strength for less aggressive glow
-        0.2,
-        0.85
-      )
-    );
+    // Note: EffectComposer can interfere with transparency
+    // Using direct rendering instead
 
     // --- RESIZE ---
     const resize = () => {
@@ -187,8 +163,6 @@ export default function Hero3D() {
 
   camera.aspect = clientWidth / clientHeight;
   camera.updateProjectionMatrix();
-
-  composer.setSize(clientWidth, clientHeight);
 
   // IMPORTANT: LineMaterial needs resolution AFTER width/height exist
   lineMat.resolution.set(clientWidth, clientHeight);
@@ -265,7 +239,7 @@ export default function Hero3D() {
         }
       }
 
-      composer.render();
+      renderer.render(scene, camera);
       requestAnimationFrame(animate);
     };
 
