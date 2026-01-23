@@ -39,6 +39,10 @@ export default function Hero3D() {
     tiltWrapper.add(spinWrapper);
     scene.add(tiltWrapper);
 
+  // scale factor to make the whole shape larger where used (easier than changing camera)
+  const SCALE = 1.35;
+  spinWrapper.scale.set(SCALE, SCALE, SCALE);
+
     // --- COLORS ---
     const colorA = new THREE.Color("#7C3AED");
     const colorB = new THREE.Color("#CCFF00");
@@ -63,7 +67,7 @@ export default function Hero3D() {
     lineGeo.setColors(colors);
 
     const lineMat = new LineMaterial({
-      linewidth: 3,
+      linewidth: 4,
       vertexColors: true,
       transparent: true,
       // keep opacity within normal range
@@ -75,7 +79,7 @@ export default function Hero3D() {
 
     // --- POINTS ---
     const pointsMat = new THREE.PointsMaterial({
-      size: 0.02,
+      size: 0.03,
       color: 0xe6f7ff,
       blending: THREE.AdditiveBlending,
       transparent: true,
@@ -135,11 +139,11 @@ export default function Hero3D() {
 
       const sprite = new THREE.Sprite(material);
       // smaller, subtler sprinkles
-      sprite.scale.set(0.04, 0.04, 0.04);
+  sprite.scale.set(0.06 * SCALE, 0.06 * SCALE, 0.06 * SCALE);
       sprite.position.copy(position);
 
       // gentler velocity away from center with a small random offset
-      const vel = position.clone().normalize().multiplyScalar(0.008 + Math.random() * 0.01);
+  const vel = position.clone().normalize().multiplyScalar((0.008 + Math.random() * 0.01) * SCALE);
       vel.x += (Math.random() - 0.5) * 0.006;
       vel.y += (Math.random() - 0.5) * 0.006;
       vel.z += (Math.random() - 0.5) * 0.006;
