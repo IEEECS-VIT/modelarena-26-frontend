@@ -33,10 +33,6 @@ export default function LandingPage() {
 
       {/* IMPORTANT: no h-screen, no overflow */}
       <main className="scroll-smooth">
-
-        {/* HOME */}
-        import Hero3D from "../components/Hero3D";
-
         <section
           id="home"
           className="min-h-screen px-12 pt-28 flex items-center"

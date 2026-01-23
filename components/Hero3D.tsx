@@ -26,7 +26,7 @@ export default function Hero3D() {
       alpha: true,
     });
       // ensure the scene has no opaque background so the canvas stays transparent
-      scene.background = null;
+      // scene.background = null;
 
     // use filmic tone mapping and slightly lower exposure to reduce overall brightness
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -73,7 +73,7 @@ export default function Hero3D() {
       vertexColors: true,
       transparent: true,
       // keep opacity within normal range
-      opacity: 0.95,
+      opacity: 2,
     });
 
     const wire = new Line2(lineGeo, lineMat);
@@ -85,7 +85,7 @@ export default function Hero3D() {
       color: 0xe6f7ff,
       blending: THREE.AdditiveBlending,
       transparent: true,
-      opacity: 1.5,
+      opacity: 2,
     });
 
     const points = new THREE.Points(baseGeo, pointsMat);
@@ -156,7 +156,17 @@ export default function Hero3D() {
     };
 
     // --- POST ---
-    const composer = new EffectComposer(renderer);
+    // Create an RGBA render target for the composer so postprocessing keeps alpha
+    const size = new THREE.Vector2();
+    renderer.getSize(size);
+    const renderTarget = new THREE.WebGLRenderTarget(size.x || 800, size.y || 600, {
+      format: THREE.RGBAFormat,
+      encoding: renderer.outputEncoding,
+      samples: Math.max(0, renderer.getContext()?.getParameter?.(renderer.getContext().SAMPLES) || 0),
+    });
+
+    const composer = new EffectComposer(renderer, renderTarget);
+    composer.renderToScreen = true;
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(
       new UnrealBloomPass(
