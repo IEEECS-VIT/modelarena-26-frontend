@@ -18,14 +18,15 @@ export default function Hero3D() {
 
     // --- SCENE ---
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    camera.position.z = 3;
+    // Reduced FOV from 75 to 45 for less perspective distortion (flatter look)
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+    camera.position.z = 6; // Moved back to compensate for zoom
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
     });
-    
+
     renderer.setClearColor(0x000000, 0);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.75;
@@ -39,9 +40,15 @@ export default function Hero3D() {
     tiltWrapper.add(spinWrapper);
     scene.add(tiltWrapper);
 
-  // scale factor to make the whole shape larger where used (easier than changing camera)
-  const SCALE = 1.35;
-  spinWrapper.scale.set(SCALE, SCALE, SCALE);
+    // scale factor to make the whole shape larger where used (easier than changing camera)
+    const SCALE = 1.35;
+    spinWrapper.scale.set(SCALE, SCALE, SCALE);
+
+    // Set initial rotation to match the reference orientation (vertex up/down)
+    // Using X=90, Y=0 with flatter camera for perfect symmetry
+    spinWrapper.rotation.x = Math.PI * 0.5;
+    spinWrapper.rotation.y = 0;
+    spinWrapper.rotation.z = 0;
 
     // --- COLORS ---
     const colorA = new THREE.Color("#7C3AED");
@@ -100,7 +107,7 @@ export default function Hero3D() {
     const sprinkles: Sprinkle[] = [];
 
     // create two soft circular sprite textures for sprinkles (one per color)
-  const makeSprinkleTexture = (col: any) => {
+    const makeSprinkleTexture = (col: any) => {
       const size = 64;
       const canvas = document.createElement("canvas");
       canvas.width = size;
@@ -123,7 +130,7 @@ export default function Hero3D() {
     const sprinkleTexA = makeSprinkleTexture(colorA);
     const sprinkleTexB = makeSprinkleTexture(colorB);
 
-  const spawnSprinkle = (position: any) => {
+    const spawnSprinkle = (position: any) => {
       if (sprinkles.length >= maxSprinkles) return;
 
       // choose color texture randomly but subtly favoring the underlying palette
@@ -139,11 +146,11 @@ export default function Hero3D() {
 
       const sprite = new THREE.Sprite(material);
       // smaller, subtler sprinkles
-  sprite.scale.set(0.06 * SCALE, 0.06 * SCALE, 0.06 * SCALE);
+      sprite.scale.set(0.06 * SCALE, 0.06 * SCALE, 0.06 * SCALE);
       sprite.position.copy(position);
 
       // gentler velocity away from center with a small random offset
-  const vel = position.clone().normalize().multiplyScalar((0.008 + Math.random() * 0.01) * SCALE);
+      const vel = position.clone().normalize().multiplyScalar((0.008 + Math.random() * 0.01) * SCALE);
       vel.x += (Math.random() - 0.5) * 0.006;
       vel.y += (Math.random() - 0.5) * 0.006;
       vel.z += (Math.random() - 0.5) * 0.006;
@@ -159,18 +166,18 @@ export default function Hero3D() {
 
     // --- RESIZE ---
     const resize = () => {
-  if (!containerRef.current) return;
+      if (!containerRef.current) return;
 
-  const { clientWidth, clientHeight } = containerRef.current;
+      const { clientWidth, clientHeight } = containerRef.current;
 
-  renderer.setSize(clientWidth, clientHeight);
+      renderer.setSize(clientWidth, clientHeight);
 
-  camera.aspect = clientWidth / clientHeight;
-  camera.updateProjectionMatrix();
+      camera.aspect = clientWidth / clientHeight;
+      camera.updateProjectionMatrix();
 
-  // IMPORTANT: LineMaterial needs resolution AFTER width/height exist
-  lineMat.resolution.set(clientWidth, clientHeight);
-};
+      // IMPORTANT: LineMaterial needs resolution AFTER width/height exist
+      lineMat.resolution.set(clientWidth, clientHeight);
+    };
 
     resize();
     window.addEventListener("resize", resize);
@@ -191,9 +198,9 @@ export default function Hero3D() {
     let prevX = spinWrapper.rotation.x;
 
     const animate = () => {
-      // base rotation
+      // base rotation 
       spinWrapper.rotation.y += 0.005;
-      spinWrapper.rotation.x += 0.002;
+      // spinWrapper.rotation.x += 0.002; // Keep X fixed to maintain vertical vertex alignment
 
       // responsive tilt
       tiltWrapper.rotation.y += 0.05 * (mx * 0.4 - tiltWrapper.rotation.y);
@@ -229,7 +236,7 @@ export default function Hero3D() {
         s.vel.multiplyScalar(0.98);
         // reduce life
         s.life -= 0.01;
-  (s.sprite.material as any).opacity = Math.max(0, s.life);
+        (s.sprite.material as any).opacity = Math.max(0, s.life);
         // slowly scale down
         s.sprite.scale.multiplyScalar(0.985);
         if (s.life <= 0) {
