@@ -135,10 +135,40 @@ export default function FAQSection() {
         <span className="text-[#CCFF00]">FAQ</span>S
       </h2>
 
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 md:[grid-template-columns:auto_1fr]">
-        {/* LEFT: Command List */}
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:gap-8 md:[grid-template-columns:auto_1fr]">
+        {/* Terminal Output - Shows FIRST on mobile, RIGHT on desktop */}
+        <div className="border border-white/20 bg-black order-first md:order-last">
+          {/* Terminal Header */}
+          <div className="flex items-center justify-between border-b border-white/20 px-4 py-2">
+            <div className="flex gap-2 flex-shrink-0">
+              <span className="h-3 w-3 rounded-full bg-red-500" />
+              <span className="h-3 w-3 rounded-full bg-yellow-400" />
+              <span className="h-3 w-3 rounded-full bg-green-500" />
+            </div>
+            <span className="hidden sm:block text-xs tracking-widest text-white/60">
+              $modelarena.sh
+            </span>
+            <span className="sm:hidden text-[10px] tracking-wider text-white/60">
+              $modelarena.sh
+            </span>
+          </div>
+
+          {/* Terminal Body */}
+          <div className="min-h-[200px] md:min-h-[260px] px-6 py-5 font-mono text-sm leading-relaxed">
+            <p ref={cmdRef} className="mb-3 text-[#CCFF00]">
+              {activeIndex !== null ? `$ ${faqs[activeIndex].command}` : ""}
+            </p>
+            <p
+              ref={outputRef}
+              className="text-white/80"
+              aria-live="polite"
+            />
+          </div>
+        </div>
+
+        {/* Command List - Shows SECOND on mobile, LEFT on desktop */}
         <div
-          className="space-y-10 w-full md:max-w-xs"
+          className="space-y-4 md:space-y-10 w-full md:max-w-xs order-last md:order-first"
           onClick={(e) => {
             // clicking empty area of the left column shows a new random fact
             if (e.target === e.currentTarget) {
@@ -159,7 +189,7 @@ export default function FAQSection() {
                   setActiveIndex(index);
                 }
               }}
-              className={`group w-full border px-5 py-4 text-left font-mono text-sm transition
+              className={`group w-full border px-5 py-3 md:py-4 text-left font-mono text-sm transition
                 ${activeIndex === index
                   ? "border-[#CCFF00] text-[#CCFF00]"
                   : "border-white/20 text-white/80 hover:border-[#CCFF00]/50 hover:text-white"
@@ -170,33 +200,6 @@ export default function FAQSection() {
               {faq.command}
             </button>
           ))}
-        </div>
-
-        {/* RIGHT: Terminal Output */}
-        <div className="border border-white/20 bg-black">
-          {/* Terminal Header */}
-          <div className="flex items-center justify-between border-b border-white/20 px-4 py-2">
-            <div className="flex gap-2">
-              <span className="h-3 w-3 rounded-full bg-red-500" />
-              <span className="h-3 w-3 rounded-full bg-yellow-400" />
-              <span className="h-3 w-3 rounded-full bg-green-500" />
-            </div>
-            <span className="text-xs tracking-widest text-white/60">
-              SSH SESSION // MODELArena // PORT:8080
-            </span>
-          </div>
-
-          {/* Terminal Body */}
-          <div className="min-h-[260px] px-6 py-5 font-mono text-sm leading-relaxed">
-            <p ref={cmdRef} className="mb-3 text-[#CCFF00]">
-              {activeIndex !== null ? `$ ${faqs[activeIndex].command}` : ""}
-            </p>
-            <p
-              ref={outputRef}
-              className="text-white/80"
-              aria-live="polite"
-            />
-          </div>
         </div>
       </div>
     </section>
