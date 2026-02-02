@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { supabase } from "../lib/supabase";
 
 import Navbar from "../components/Navbar";
@@ -10,7 +11,12 @@ import ScrollReveal from "../components/ScrollReveal";
 import TimelineSection from "../components/TimelineSection";
 import FAQSection from "../components/FaqSection";
 import Footer from "../components/Footer";
-import Hero3D from "../components/Hero3D";
+
+// Dynamic import with SSR disabled to prevent white flash
+const Hero3D = dynamic(() => import("../components/Hero3D"), {
+  ssr: false,
+  loading: () => null, // Don't show anything while loading
+});
 
 export default function LandingPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

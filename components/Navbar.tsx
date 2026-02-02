@@ -40,6 +40,8 @@ export default function Navbar({
 
   const login = async () => {
     setIsMenuOpen(false);
+    // Set flag to skip preloader after OAuth redirect
+    sessionStorage.setItem("internalNavigation", "true");
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: location.origin },
@@ -48,6 +50,8 @@ export default function Navbar({
 
   const logout = async () => {
     setIsMenuOpen(false);
+    // Set flag to skip preloader after logout
+    sessionStorage.setItem("internalNavigation", "true");
     await supabase.auth.signOut();
     location.reload();
   };

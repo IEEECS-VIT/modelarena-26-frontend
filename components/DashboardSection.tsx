@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import CreateTeamModal from "./CreateteamModal";
-import JoinTeamModal from "./JoinTeamModal";
 import TeamCard from "./TeamCard";
 import LeaveTeamModal from "./LeaveTeamModal";
 import { RiLinkM } from "react-icons/ri";
@@ -17,8 +15,9 @@ export default function DashboardSection({ user }: DashboardSectionProps) {
   const [hasTeam, setHasTeam] = useState(false);
   const [teamData, setTeamData] = useState<any>(null);
 
-  const [showCreate, setShowCreate] = useState(false);
-  const [showJoin, setShowJoin] = useState(false);
+  // Inline input states
+  const [teamName, setTeamName] = useState("");
+  const [joinCode, setJoinCode] = useState("");
 
   const headingRef = useRef<HTMLHeadingElement>(null);
 
@@ -63,12 +62,14 @@ export default function DashboardSection({ user }: DashboardSectionProps) {
     >
       <div className="w-full max-w-[90%] mx-auto">
 
-        {/* SECTION TITLE */}
-        <div className="text-center mb-16 whitespace-nowrap min-h-[4rem]">
-          <h2 ref={headingRef} className="text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-widest uppercase">
-            {/* Text injected by JS */}
-          </h2>
-        </div>
+        {/* SECTION TITLE - Only show welcome message when no team */}
+        {!hasTeam && (
+          <div className="text-center mb-16 whitespace-nowrap min-h-[4rem]">
+            <h2 ref={headingRef} className="text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-widest uppercase">
+              {/* Text injected by JS */}
+            </h2>
+          </div>
+        )}
 
         {!hasTeam && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
@@ -83,14 +84,26 @@ export default function DashboardSection({ user }: DashboardSectionProps) {
               <div className="text-6xl text-[#CCFF00] mb-8">[ + ]</div>
 
               <input
-                disabled
+                value={teamName}
+                onChange={(e) => setTeamName(e.target.value)}
                 placeholder="Enter_Team_Name..."
-                className="w-full bg-neutral-800 border border-[#CCFF00]/40 text-white px-4 py-2 rounded mb-6 placeholder:text-white/40"
+                className="w-full bg-neutral-800 border border-[#CCFF00]/40 text-white px-4 py-2 rounded mb-6 placeholder:text-white/40 focus:outline-none focus:border-[#CCFF00]"
               />
 
               <button
-                onClick={() => setShowCreate(true)}
-                className="w-full bg-[#CCFF00] text-black py-4 rounded font-semibold tracking-widest hover:bg-[#b8e600] transition"
+                onClick={() => {
+                  if (!teamName.trim()) return;
+                  setTeamData({
+                    teamName: teamName,
+                    captain: "You",
+                    teamCode: "ABC123",
+                    regNo: "REG-001",
+                  });
+                  setHasTeam(true);
+                  setTeamName("");
+                }}
+                disabled={!teamName.trim()}
+                className="w-full bg-[#CCFF00] text-black py-4 rounded font-semibold tracking-widest hover:bg-[#b8e600] transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 &gt; EXECUTE_CREATE
               </button>
@@ -108,14 +121,26 @@ export default function DashboardSection({ user }: DashboardSectionProps) {
               </div>
 
               <input
-                disabled
+                value={joinCode}
+                onChange={(e) => setJoinCode(e.target.value)}
                 placeholder="Paste_Code_Here..."
-                className="w-full bg-neutral-800 border border-[#CCFF00]/40 text-white px-4 py-2 rounded mb-6 placeholder:text-white/40"
+                className="w-full bg-neutral-800 border border-[#CCFF00]/40 text-white px-4 py-2 rounded mb-6 placeholder:text-white/40 focus:outline-none focus:border-[#CCFF00]"
               />
 
               <button
-                onClick={() => setShowJoin(true)}
-                className="w-full border border-white text-white py-4 rounded tracking-widest hover:bg-white hover:text-black transition"
+                onClick={() => {
+                  if (!joinCode.trim()) return;
+                  setTeamData({
+                    teamName: "Joined Team",
+                    captain: "Captain Name",
+                    teamCode: joinCode,
+                    regNo: "REG-002",
+                  });
+                  setHasTeam(true);
+                  setJoinCode("");
+                }}
+                disabled={!joinCode.trim()}
+                className="w-full border border-white text-white py-4 rounded tracking-widest hover:bg-white hover:text-black transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 &gt; CONNECT
               </button>
@@ -125,39 +150,12 @@ export default function DashboardSection({ user }: DashboardSectionProps) {
 
         {/* TEAM EXISTS */}
         {hasTeam && (
-          <div className="mt-12">
-            <TeamCard team={teamData} />
-
-            <button
-              onClick={() => setShowLeaveModal(true)}
-              className="mt-6 text-red-500 hover:underline"
-            >
-              &gt; TERMINATE_CLUSTER
-            </button>
+          <div className="w-full">
+            <TeamCard
+              team={teamData}
+              onLeave={() => setShowLeaveModal(true)}
+            />
           </div>
-        )}
-
-        {/* MODALS */}
-        {showCreate && (
-          <CreateTeamModal
-            onClose={() => setShowCreate(false)}
-            onCreate={(team: any) => {
-              setTeamData(team);
-              setHasTeam(true);
-              setShowCreate(false);
-            }}
-          />
-        )}
-
-        {showJoin && (
-          <JoinTeamModal
-            onClose={() => setShowJoin(false)}
-            onJoin={(team: any) => {
-              setTeamData(team);
-              setHasTeam(true);
-              setShowJoin(false);
-            }}
-          />
         )}
 
         {showLeaveModal && (

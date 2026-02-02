@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, useTexture } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
@@ -103,9 +103,18 @@ const GlowingIcosahedron = () => {
 
 // --- 3. The Main Page Component ---
 export default function Hero3D() {
+  const [isReady, setIsReady] = useState(false);
+
   return (
-    <div className="w-full h-full overflow-hidden">
-      <Canvas dpr={[1, 2]} gl={{ alpha: true }} style={{ background: 'transparent' }}>
+    <div
+      className={`w-full h-full overflow-hidden transition-opacity duration-500 ${isReady ? 'opacity-100' : 'opacity-0'}`}
+    >
+      <Canvas
+        dpr={[1, 2]}
+        gl={{ alpha: true }}
+        style={{ background: 'transparent' }}
+        onCreated={() => setIsReady(true)}
+      >
         <PerspectiveCamera makeDefault position={[0, 0, 4.5]} fov={50} />
         <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.3} />
 
