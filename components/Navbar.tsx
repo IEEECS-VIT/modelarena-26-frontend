@@ -161,28 +161,50 @@ export default function Navbar({
           )}
         </div>
 
-        {/* MOBILE HAMBURGER */}
-        <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="md:hidden z-50 text-white p-2"
-        >
-          {isMenuOpen ? (
-            <RiCloseLine className="w-8 h-8" />
-          ) : (
+        {/* MOBILE HAMBURGER (Visible only when menu is closed) */}
+        {!isMenuOpen && (
+          <button
+            onClick={() => setIsMenuOpen(true)}
+            className="md:hidden z-50 text-white p-2"
+          >
             <RiMenu3Line className="w-8 h-8" />
-          )}
-        </button>
+          </button>
+        )}
       </div>
 
-      {/* MOBILE MENU OVERLAY */}
+      {/* MOBILE MENU OVERLAY (Full Screen Slide-over) */}
       <div
-        className={`fixed inset-0 bg-black/95 backdrop-blur-xl z-40 flex flex-col items-center justify-center transition-all duration-500 ease-in-out md:hidden ${isMenuOpen ? "opacity-100 pointer-events-auto translate-y-0" : "opacity-0 pointer-events-none -translate-y-full"
+        className={`fixed inset-0 z-[60] flex flex-col transition-transform duration-300 ease-out md:hidden bg-black ${isMenuOpen ? "translate-x-0" : "translate-x-full"
           }`}
+        style={{
+          backgroundColor: "#000000",
+          width: "100vw",
+          height: "100vh",
+          minHeight: "100vh",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0
+        }}
       >
-        <div className="flex flex-col items-center gap-10">
+        {/* Header inside Menu */}
+        <div className="flex items-center justify-between px-6 h-16 border-b border-white/10">
+          <span className="font-bold tracking-widest text-lg">
+            <span className="text-white">MODEL</span><span className="text-[#CCFF00]">ARENA</span>
+          </span>
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            className="text-white p-2"
+          >
+            <RiCloseLine className="w-8 h-8" />
+          </button>
+        </div>
+
+        {/* Menu Content */}
+        <div className="flex flex-col items-center justify-center flex-1 gap-8 pb-20">
           <button
             onClick={() => scrollTo("home")}
-            className={`text-2xl font-bold tracking-widest hover:text-[#CCFF00] transition ${active === "home" ? "text-[#CCFF00]" : "text-white"}`}
+            className={`text-lg font-bold tracking-widest hover:text-[#CCFF00] transition-colors ${active === "home" ? "text-[#CCFF00]" : "text-white"}`}
           >
             HOME
           </button>
@@ -196,7 +218,7 @@ export default function Navbar({
                 }
                 window.location.href = "/dashboard";
               }}
-              className={`text-2xl font-bold tracking-widest hover:text-[#CCFF00] transition ${pathname === "/dashboard" ? "text-[#CCFF00]" : "text-white"}`}
+              className={`text-lg font-bold tracking-widest hover:text-[#CCFF00] transition-colors ${pathname === "/dashboard" ? "text-[#CCFF00]" : "text-white"}`}
             >
               DASHBOARD
             </button>
@@ -204,14 +226,14 @@ export default function Navbar({
 
           <button
             onClick={() => scrollTo("timeline")}
-            className={`text-2xl font-bold tracking-widest hover:text-[#CCFF00] transition ${active === "timeline" ? "text-[#CCFF00]" : "text-white"}`}
+            className={`text-lg font-bold tracking-widest hover:text-[#CCFF00] transition-colors ${active === "timeline" ? "text-[#CCFF00]" : "text-white"}`}
           >
             TIMELINE
           </button>
 
           <button
             onClick={() => scrollTo("faq")}
-            className={`text-2xl font-bold tracking-widest hover:text-[#CCFF00] transition ${active === "faq" ? "text-[#CCFF00]" : "text-white"}`}
+            className={`text-lg font-bold tracking-widest hover:text-[#CCFF00] transition-colors ${active === "faq" ? "text-[#CCFF00]" : "text-white"}`}
           >
             FAQ
           </button>
@@ -220,14 +242,14 @@ export default function Navbar({
             {!isLoggedIn ? (
               <button
                 onClick={login}
-                className="bg-[#CCFF00] px-8 py-3 text-lg font-bold tracking-widest text-black shadow-[4px_4px_0px_0px_white] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"
+                className="bg-[#CCFF00] px-8 py-3 text-sm font-bold tracking-widest text-black shadow-[3px_3px_0px_0px_white] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
               >
                 LOGIN
               </button>
             ) : (
               <button
                 onClick={logout}
-                className="bg-[#CCFF00] px-8 py-3 text-lg font-bold tracking-widest text-black shadow-[4px_4px_0px_0px_white] active:shadow-none active:translate-x-[4px] active:translate-y-[4px]"
+                className="bg-[#CCFF00] px-8 py-3 text-sm font-bold tracking-widest text-black shadow-[3px_3px_0px_0px_white] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
               >
                 LOGOUT
               </button>
