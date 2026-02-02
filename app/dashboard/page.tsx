@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import DashboardSection from "@/components/DashboardSection";
-import Footer from "@/components/Footer";
 
 export default function DashboardPage() {
     const [user, setUser] = useState<any>(null);

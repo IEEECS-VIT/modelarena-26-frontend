@@ -50,7 +50,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-7xl mx-auto items-center relative z-10">
 
             {/* LEFT TEXT */}
-            <ScrollReveal className="w-full flex flex-col items-start">
+            <ScrollReveal className="w-full flex flex-col items-center md:items-start text-center md:text-left order-2 md:order-1">
 
               {/* Main headline with text shadow for depth */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-wide leading-[1.3] uppercase">
@@ -72,10 +72,7 @@ export default function LandingPage() {
                   if (isLoggedIn) {
                     window.location.href = "/dashboard";
                   } else {
-                    supabase.auth.signInWithOAuth({
-                      provider: "google",
-                      options: { redirectTo: location.origin },
-                    });
+                    window.open("https://vtop.vit.ac.in", "_blank");
                   }
                 }}
                 className="mt-8 bg-[#CCFF00] px-6 py-2.5 text-sm font-bold tracking-widest text-black uppercase transition-all duration-200 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.9)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
@@ -85,7 +82,7 @@ export default function LandingPage() {
             </ScrollReveal>
 
             {/* RIGHT 3D */}
-            <div className="h-[350px] md:h-[480px] lg:h-[550px] relative">
+            <div className="h-[350px] md:h-[480px] lg:h-[550px] relative order-1 md:order-2">
               <Hero3D />
             </div>
           </div>

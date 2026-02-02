@@ -127,7 +127,7 @@ export default function FAQSection() {
   return (
     <section
       id="faq"
-      className="min-h-screen px-12 py-20 text-white"
+      className="min-h-screen px-6 md:px-12 py-20 text-white"
     >
       {/* Heading */}
       {/* Heading */}

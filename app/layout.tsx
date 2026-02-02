@@ -1,5 +1,14 @@
+import type { Metadata } from "next";
 import "./globals.css";
 import { sora } from "@/lib/fonts";
+
+export const metadata: Metadata = {
+  title: "ModelArena | IEEECS-VIT",
+  description: "ModelArena by IEEECS-VIT",
+  icons: {
+    icon: "/hero/ma-logo.png",
+  },
+};
 
 export default function RootLayout({
   children,
@@ -8,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-  <body className={sora.className}>{children}</body>
+      <body className={sora.className}>{children}</body>
     </html>
   );
 }
