@@ -1,274 +1,125 @@
-"use client";
+'use client';
 
-import * as THREE from "three";
+import React, { useRef, useMemo } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, PerspectiveCamera, useTexture } from '@react-three/drei';
+import { EffectComposer, Bloom } from '@react-three/postprocessing';
+// FIX: Import namespace to avoid 'no exported member' errors
+import * as THREE from 'three';
 
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { LineSegmentsGeometry } from "three/examples/jsm/lines/LineSegmentsGeometry.js";
-import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
-import { Line2 } from "three/examples/jsm/lines/Line2.js";
-import { useEffect, useRef } from "react";
+// --- 1. Custom Shader for the Gradient Wireframe ---
+const vertexShader = `
+  varying vec3 vPos;
+  void main() {
+    vPos = position;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
 
-export default function Hero3D() {
-  const containerRef = useRef<HTMLDivElement>(null);
+const fragmentShader = `
+  varying vec3 vPos;
+  uniform vec3 colorA;
+  uniform vec3 colorB;
 
-  useEffect(() => {
-    if (!containerRef.current) return;
+  void main() {
+    float mixValue = (vPos.x + vPos.y * 0.5) * 0.5 + 0.5;
+    mixValue = clamp(mixValue, 0.0, 1.0);
+    vec3 finalColor = mix(colorA, colorB, mixValue);
+    gl_FragColor = vec4(finalColor, 1.0);
+  }
+`;
 
-    // --- SCENE ---
-    const scene = new THREE.Scene();
-    // Reduced FOV from 75 to 45 for less perspective distortion (flatter look)
-    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
-    camera.position.z = 6; // Moved back to compensate for zoom
+// --- 2. The Main Geometric Structure ---
+const GlowingIcosahedron = () => {
+  // FIX: Use 'Group' type directly
+  const meshRef = useRef<THREE.Group>(null);
 
-    const renderer = new THREE.WebGLRenderer({
-      antialias: true,
-      alpha: true,
-    });
+  // Load the logo texture
+  const logoTexture = useTexture('/hero/ma-logo.png');
 
-    renderer.setClearColor(0x000000, 0);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 0.75;
-    renderer.setPixelRatio(window.devicePixelRatio);
-
-    containerRef.current.appendChild(renderer.domElement);
-
-    // --- GROUPS ---
-    const tiltWrapper = new THREE.Group();
-    const spinWrapper = new THREE.Group();
-    tiltWrapper.add(spinWrapper);
-    scene.add(tiltWrapper);
-
-    // scale factor to make the whole shape larger where used (easier than changing camera)
-    const SCALE = 1.35;
-    spinWrapper.scale.set(SCALE, SCALE, SCALE);
-
-    // Set initial rotation to match the reference orientation (vertex up/down)
-    // Using X=90, Y=0 with flatter camera for perfect symmetry
-    spinWrapper.rotation.x = Math.PI * 0.5;
-    spinWrapper.rotation.y = 0;
-    spinWrapper.rotation.z = 0;
-
-    // --- COLORS ---
-    const colorA = new THREE.Color("#7C3AED");
-    const colorB = new THREE.Color("#CCFF00");
-
-    // --- GEOMETRY ---
-    const baseGeo = new THREE.IcosahedronGeometry(1.3, 0);
-    const edges = new THREE.EdgesGeometry(baseGeo);
-    const lineGeo = new LineSegmentsGeometry().setPositions(
-      edges.attributes.position.array
-    );
-
-    const pos = edges.attributes.position.array;
-    const colors: number[] = [];
-    const c = new THREE.Color();
-
-    for (let i = 0; i < pos.length; i += 3) {
-      const t = (pos[i + 1] + 1.3) / 2.6;
-      c.lerpColors(colorA, colorB, t);
-      colors.push(c.r, c.g, c.b);
+  useFrame((state, delta) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y += delta * 0.1;
+      meshRef.current.rotation.x += delta * 0.05;
     }
+  });
 
-    lineGeo.setColors(colors);
+  // Vibrant colors for the gradient
+  const colorA = useMemo(() => new THREE.Color('#9333EA'), []); // Brighter purple
+  const colorB = useMemo(() => new THREE.Color('#D4FF00'), []); // Brighter lime
 
-    const lineMat = new LineMaterial({
-      linewidth: 4,
-      vertexColors: true,
-      transparent: true,
-      // keep opacity within normal range
-      opacity: 2,
-    });
+  // FIX: Use 'IcosahedronGeometry' directly
+  const geometry = useMemo(() => new THREE.IcosahedronGeometry(1.6, 0), []);
 
-    const wire = new Line2(lineGeo, lineMat);
-    spinWrapper.add(wire);
+  return (
+    <group ref={meshRef} position={[0, 0.3, 0]} rotation={[0.2, 0, 0]}>
+      {/* Logo sprite in the center */}
+      <sprite scale={[1.2, 1.2, 1]}>
+        <spriteMaterial
+          map={logoTexture}
+          transparent
+          opacity={0.9}
+          depthTest={false}
+        />
+      </sprite>
 
-    // --- POINTS ---
-    const pointsMat = new THREE.PointsMaterial({
-      size: 0.03,
-      color: 0xe6f7ff,
-      blending: THREE.AdditiveBlending,
-      transparent: true,
-      opacity: 2,
-    });
+      <lineSegments>
+        <wireframeGeometry args={[geometry]} />
+        <shaderMaterial
+          vertexShader={vertexShader}
+          fragmentShader={fragmentShader}
+          uniforms={{
+            colorA: { value: colorA },
+            colorB: { value: colorB },
+          }}
+          transparent
+          depthTest={false}
+          opacity={1}
+        />
+      </lineSegments>
 
-    const points = new THREE.Points(baseGeo, pointsMat);
-    spinWrapper.add(points);
+      <points>
+        <bufferGeometry attach="geometry" {...geometry} />
+        <pointsMaterial
+          size={0.12}
+          color="#CCFF00"
+          transparent
+          opacity={0.7}
+          sizeAttenuation={true}
+        />
+      </points>
 
-    // --- SPRINKLES (small particles that emit when the shape moves) ---
-    const maxSprinkles = 80;
-    type Sprinkle = {
-      sprite: any;
-      vel: any;
-      life: number;
-    };
+      <mesh geometry={geometry}>
+        <meshBasicMaterial
+          color="#000000"
+          transparent
+          opacity={0.05}
+          wireframe={false}
+        />
+      </mesh>
+    </group>
+  );
+};
 
-    const sprinkles: Sprinkle[] = [];
+// --- 3. The Main Page Component ---
+export default function Hero3D() {
+  return (
+    <div className="w-full h-full overflow-hidden">
+      <Canvas dpr={[1, 2]} gl={{ alpha: true }} style={{ background: 'transparent' }}>
+        <PerspectiveCamera makeDefault position={[0, 0, 4.5]} fov={50} />
+        <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.3} />
 
-    // create two soft circular sprite textures for sprinkles (one per color)
-    const makeSprinkleTexture = (col: any) => {
-      const size = 64;
-      const canvas = document.createElement("canvas");
-      canvas.width = size;
-      canvas.height = size;
-      const ctx = canvas.getContext("2d")!;
-      const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-      // bright center then colored halo matching the shape palette, with low alpha
-      grad.addColorStop(0, "rgba(255,255,255,1)");
-      grad.addColorStop(0.15, `rgba(${Math.round(col.r * 255)}, ${Math.round(col.g * 255)}, ${Math.round(col.b * 255)}, 0.9)`);
-      grad.addColorStop(0.5, `rgba(${Math.round(col.r * 255)}, ${Math.round(col.g * 255)}, ${Math.round(col.b * 255)}, 0.45)`);
-      grad.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, size, size);
-      const tex = new THREE.CanvasTexture(canvas);
-      tex.minFilter = THREE.LinearFilter;
-      tex.generateMipmaps = false;
-      return tex;
-    };
+        <GlowingIcosahedron />
 
-    const sprinkleTexA = makeSprinkleTexture(colorA);
-    const sprinkleTexB = makeSprinkleTexture(colorB);
-
-    const spawnSprinkle = (position: any) => {
-      if (sprinkles.length >= maxSprinkles) return;
-
-      // choose color texture randomly but subtly favoring the underlying palette
-      const tex = Math.random() > 0.5 ? sprinkleTexA : sprinkleTexB;
-
-      const material = new THREE.SpriteMaterial({
-        map: tex,
-        blending: THREE.AdditiveBlending,
-        transparent: true,
-        depthWrite: false,
-        opacity: 0.7,
-      });
-
-      const sprite = new THREE.Sprite(material);
-      // smaller, subtler sprinkles
-      sprite.scale.set(0.06 * SCALE, 0.06 * SCALE, 0.06 * SCALE);
-      sprite.position.copy(position);
-
-      // gentler velocity away from center with a small random offset
-      const vel = position.clone().normalize().multiplyScalar((0.008 + Math.random() * 0.01) * SCALE);
-      vel.x += (Math.random() - 0.5) * 0.006;
-      vel.y += (Math.random() - 0.5) * 0.006;
-      vel.z += (Math.random() - 0.5) * 0.006;
-
-      const s: Sprinkle = { sprite, vel, life: 0.7 };
-      sprinkles.push(s);
-      scene.add(sprite);
-    };
-
-    // --- POST ---
-    // Note: EffectComposer can interfere with transparency
-    // Using direct rendering instead
-
-    // --- RESIZE ---
-    const resize = () => {
-      if (!containerRef.current) return;
-
-      const { clientWidth, clientHeight } = containerRef.current;
-
-      renderer.setSize(clientWidth, clientHeight);
-
-      camera.aspect = clientWidth / clientHeight;
-      camera.updateProjectionMatrix();
-
-      // IMPORTANT: LineMaterial needs resolution AFTER width/height exist
-      lineMat.resolution.set(clientWidth, clientHeight);
-    };
-
-    resize();
-    window.addEventListener("resize", resize);
-
-    // --- MOUSE ---
-    let mx = 0,
-      my = 0;
-
-    const onMouse = (e: MouseEvent) => {
-      mx = (e.clientX / window.innerWidth) * 2 - 1;
-      my = -(e.clientY / window.innerHeight) * 2 + 1;
-    };
-
-    window.addEventListener("mousemove", onMouse);
-
-    // --- ANIMATE ---
-    let prevY = spinWrapper.rotation.y;
-    let prevX = spinWrapper.rotation.x;
-
-    const animate = () => {
-      // base rotation 
-      spinWrapper.rotation.y += 0.005;
-      // spinWrapper.rotation.x += 0.002; // Keep X fixed to maintain vertical vertex alignment
-
-      // responsive tilt
-      tiltWrapper.rotation.y += 0.05 * (mx * 0.4 - tiltWrapper.rotation.y);
-      tiltWrapper.rotation.x += 0.05 * (my * 0.4 - tiltWrapper.rotation.x);
-
-      // detect motion amount (how much the shape rotated since last frame)
-      const dy = Math.abs(spinWrapper.rotation.y - prevY);
-      const dx = Math.abs(spinWrapper.rotation.x - prevX);
-      const motion = Math.sqrt(dx * dx + dy * dy);
-
-      // when motion is above a tiny threshold, spawn a few sprinkles
-      if (motion > 0.0005) {
-        const spawnCount = Math.min(4, Math.ceil(motion * 200));
-        for (let i = 0; i < spawnCount; i++) {
-          // pick a random vertex from base geometry
-          const posAttr = baseGeo.attributes.position;
-          const vIdx = Math.floor(Math.random() * (posAttr.count));
-          const p = new THREE.Vector3().fromBufferAttribute(posAttr, vIdx);
-          // transform the local vertex position to world space
-          spinWrapper.localToWorld(p);
-          spawnSprinkle(p);
-        }
-      }
-
-      prevY = spinWrapper.rotation.y;
-      prevX = spinWrapper.rotation.x;
-
-      // update sprinkles: simple physics + fade
-      for (let i = sprinkles.length - 1; i >= 0; i--) {
-        const s = sprinkles[i];
-        s.sprite.position.add(s.vel);
-        // apply slight damping
-        s.vel.multiplyScalar(0.98);
-        // reduce life
-        s.life -= 0.01;
-        (s.sprite.material as any).opacity = Math.max(0, s.life);
-        // slowly scale down
-        s.sprite.scale.multiplyScalar(0.985);
-        if (s.life <= 0) {
-          scene.remove(s.sprite);
-          if ((s.sprite.material as any).map) {
-            // don't dispose the shared texture
-          }
-          (s.sprite.material as any).dispose();
-          s.sprite.geometry.dispose?.();
-          sprinkles.splice(i, 1);
-        }
-      }
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", onMouse);
-      // cleanup sprinkles
-      for (const s of sprinkles) {
-        scene.remove(s.sprite);
-        (s.sprite.material as any).dispose();
-      }
-      sprinkles.length = 0;
-      containerRef.current?.removeChild(renderer.domElement);
-      renderer.dispose();
-    };
-  }, []);
-
-  return <div ref={containerRef} className="w-full h-full" />;
+        <EffectComposer enableNormalPass={false}>
+          <Bloom
+            luminanceThreshold={0.3}
+            mipmapBlur
+            intensity={1.5}
+            radius={0.3}
+          />
+        </EffectComposer>
+      </Canvas>
+    </div>
+  );
 }

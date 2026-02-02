@@ -1,12 +1,5 @@
-// Minimal ambient declarations for three.js and its example modules
-// This file provides `any` types so TypeScript compilation succeeds without
-// installing full `@types/three`. For stricter typing, install the official
-// types: `npm i -D @types/three` and remove or narrow these declarations.
-
-declare module "three" {
-  const Three: any;
-  export = Three;
-}
+// Ambient declarations for three.js example modules
+// Note: The main "three" module types come from @types/three
 
 declare module "three/examples/jsm/postprocessing/EffectComposer.js" {
   export const EffectComposer: any;

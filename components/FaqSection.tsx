@@ -130,8 +130,9 @@ export default function FAQSection() {
       className="min-h-screen px-12 py-20 text-white"
     >
       {/* Heading */}
-      <h2 className="mb-12 text-center text-4xl font-semibold tracking-widest">
-        <span className="text-[#CCFF00]">F</span>AQ
+      {/* Heading */}
+      <h2 className="mb-20 text-center text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-wide uppercase">
+        <span className="text-[#CCFF00]">FAQ</span>S
       </h2>
 
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 md:[grid-template-columns:auto_1fr]">
@@ -159,10 +160,9 @@ export default function FAQSection() {
                 }
               }}
               className={`group w-full border px-5 py-4 text-left font-mono text-sm transition
-                ${
-                  activeIndex === index
-                    ? "border-[#CCFF00] text-[#CCFF00]"
-                    : "border-white/20 text-white/80 hover:border-[#CCFF00]/50 hover:text-white"
+                ${activeIndex === index
+                  ? "border-[#CCFF00] text-[#CCFF00]"
+                  : "border-white/20 text-white/80 hover:border-[#CCFF00]/50 hover:text-white"
                 }
               `}
             >

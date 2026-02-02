@@ -15,7 +15,7 @@ const SOCIAL_LINKS = {
 
 export default function Footer() {
   return (
-  <footer className="relative bg-black text-white px-6 py-16 overflow-hidden">
+    <footer className="relative bg-black text-white px-6 py-16 overflow-hidden">
 
       {/* subtle top border */}
       <div className="absolute inset-x-0 top-0 h-0.5 bg-white/5" />
@@ -123,7 +123,7 @@ export default function Footer() {
       {/* BOTTOM CENTER LOGO */}
       <div className="mt-8 flex justify-center">
         <Image
-          src="/hero/logo.png"
+          src="/hero/ieeecs-logo.png"
           alt="IEEE Computer Society"
           width={140}
           height={48}
