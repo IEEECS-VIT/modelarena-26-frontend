@@ -35,8 +35,38 @@ export default function LandingPage() {
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (event, session) => {
         setIsLoggedIn(!!session);
+
+        // // Call /api/user on sign in to check if user is registered on VTOP
+        // if (event === "SIGNED_IN" && session) {
+        //   try {
+        //     const response = await fetch("/api/user", {
+        //       method: "POST",
+        //       headers: {
+        //         "Authorization": `Bearer ${session.access_token}`,
+        //         "Content-Type": "application/json",
+        //       },
+        //     });
+
+        //     if (!response.ok) {
+        //       let errorMessage = "Authentication failed";
+        //       try {
+        //         const errorData = await response.json();
+        //         errorMessage = errorData.error || errorMessage;
+        //       } catch {
+        //         // Response wasn't JSON, use status text
+        //         errorMessage = response.statusText || errorMessage;
+        //       }
+        //       // Sign out the user and show backend error message
+        //       await supabase.auth.signOut();
+        //       alert(errorMessage);
+        //     }
+        //   } catch (error) {
+        //     console.error("Failed to check user registration:", error);
+        //     // Don't crash the app, just log the error
+        //   }
+        // }
       }
     );
 
