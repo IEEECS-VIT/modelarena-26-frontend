@@ -26,8 +26,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Verify user with backend (just checks if registered)
     const verifyWithBackend = async (accessToken: string): Promise<boolean> => {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+        if (!apiUrl) {
+            throw new Error("Backend API URL not configured");
+        }
+
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
+            const response = await fetch(`${apiUrl}/user`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
@@ -65,23 +71,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 const { data: { session: currentSession } } = await supabase.auth.getSession();
 
                 if (currentSession) {
-                    // Try to get cached session first (for faster initial load)
-                    const cachedSession = localStorage.getItem(STORAGE_KEY);
-
-                    if (cachedSession) {
-                        // Use cached data for immediate UI, but session from Supabase is authoritative
-                        setUser(currentSession.user);
-                        setSession(currentSession);
-                        // Update localStorage with fresh session
-                        saveSession(currentSession);
-                    } else {
-                        // First time - verify with backend
-                        await verifyWithBackend(currentSession.access_token);
-                        // If verification passes, save full session to localStorage
-                        setUser(currentSession.user);
-                        setSession(currentSession);
-                        saveSession(currentSession);
-                    }
+                    // Always verify with backend to ensure user is still registered
+                    await verifyWithBackend(currentSession.access_token);
+                    // If verification passes, save session
+                    setUser(currentSession.user);
+                    setSession(currentSession);
+                    saveSession(currentSession);
                 }
             } catch (error) {
                 console.error("Auth init error:", error);

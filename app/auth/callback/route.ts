@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export async function GET(request: Request) {
     const { searchParams, origin } = new URL(request.url)
@@ -21,6 +21,12 @@ export async function GET(request: Request) {
     }
 
     // Verify user exists in backend database
+    if (!API_URL) {
+        console.error('Backend API URL not configured')
+        await supabase.auth.signOut()
+        return NextResponse.redirect(`${origin}/?error=${encodeURIComponent('Backend not configured')}`)
+    }
+
     try {
         const response = await fetch(`${API_URL}/user`, {
             method: 'POST',
