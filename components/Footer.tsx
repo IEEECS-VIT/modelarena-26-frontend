@@ -9,7 +9,7 @@ const SOCIAL_LINKS = {
   linkedin: "https://www.linkedin.com/company/ieee-cs-vit/posts/?feedView=all",
   youtube: "https://www.youtube.com/@ieeecomputersociety-vitcha2386",
   x: "https://x.com/ieeecsvit",
-  github: "https://x.com/ieeecsvit",
+  github: "https://github.com/ieeecs-vit",
   medium: "https://medium.com/@IEEE_Computer_Society_VIT",
 };
 

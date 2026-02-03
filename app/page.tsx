@@ -18,6 +18,7 @@ import {
 import TimelineSection from "../components/TimelineSection";
 import FAQSection from "../components/FaqSection";
 import Footer from "../components/Footer";
+import AboutSection from "@/components/AboutSection";
 
 const Hero3D = dynamic(() => import("../components/Hero3D"), {
   ssr: false,
@@ -164,6 +165,14 @@ export default function LandingPage() {
           </BlurReveal>
         </section>
 
+        {/* ========== ABOUT SECTION ========== */}
+        <section
+          id="about">
+          <ClipReveal direction="bottom">
+            <AboutSection />
+          </ClipReveal>
+        </section>
+        
         {/* ========== TIMELINE SECTION ========== */}
         <section id="timeline">
           <ClipReveal direction="bottom">
