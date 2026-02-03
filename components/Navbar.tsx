@@ -61,7 +61,7 @@ export default function Navbar({
       return;
     }
 
-    const ids = ["home", "timeline", "faq"];
+  const ids = ["home", "about", "timeline", "faq"];
     const elements = ids.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
     if (!elements.length) return;
 
@@ -103,6 +103,17 @@ export default function Navbar({
           >
             HOME
             {active === "home" && (
+              <span className="absolute -bottom-2 left-0 h-1 w-full bg-[#CCFF00] rounded" />
+            )}
+          </button>
+
+          <button
+            onClick={() => scrollTo("about")}
+            className={`relative text-sm md:text-base tracking-wide md:tracking-wider px-2 md:px-3 py-1 font-medium transition ${active === "about" ? "text-[#CCFF00]" : "text-white/80 hover:text-white"
+              }`}
+          >
+            ABOUT
+            {active === "about" && (
               <span className="absolute -bottom-2 left-0 h-1 w-full bg-[#CCFF00] rounded" />
             )}
           </button>
@@ -211,6 +222,13 @@ export default function Navbar({
             className={`text-lg font-bold tracking-widest hover:text-[#CCFF00] transition-colors ${active === "home" ? "text-[#CCFF00]" : "text-white"}`}
           >
             HOME
+          </button>
+
+          <button
+            onClick={() => scrollTo("about")}
+            className={`text-lg font-bold tracking-widest hover:text-[#CCFF00] transition-colors ${active === "about" ? "text-[#CCFF00]" : "text-white"}`}
+          >
+            ABOUT
           </button>
 
           {isLoggedIn && (
