@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const faqs = [
   {
@@ -43,13 +46,15 @@ const faqs = [
 ];
 
 export default function FAQSection() {
-  // null = no question selected yet
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const outputRef = useRef<HTMLParagraphElement | null>(null);
   const cmdRef = useRef<HTMLParagraphElement | null>(null);
   const typingTl = useRef<gsap.core.Tween | null>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
+  const buttonsRef = useRef<HTMLDivElement>(null);
 
-  // typing effect when activeIndex changes
   const [currentFact, setCurrentFact] = useState<string>(
     "Fact: Around 90% of the cost in ML projects comes from data collection and cleaning — good data matters more than fancy models."
   );
@@ -69,19 +74,85 @@ export default function FAQSection() {
 
   const randomFact = () => facts[Math.floor(Math.random() * facts.length)];
 
-  // pick a random fact at first render
   useEffect(() => {
     setCurrentFact(randomFact());
   }, []);
 
+  // Scroll animations
+  useEffect(() => {
+    const section = sectionRef.current;
+    const heading = headingRef.current;
+    const terminal = terminalRef.current;
+    const buttons = buttonsRef.current;
+    if (!section || !heading || !terminal || !buttons) return;
+
+    const ctx = gsap.context(() => {
+      // Heading split text animation
+      const chars = heading.querySelectorAll(".char");
+      gsap.fromTo(
+        chars,
+        { y: 100, opacity: 0, rotateX: -90 },
+        {
+          y: 0,
+          opacity: 1,
+          rotateX: 0,
+          duration: 0.8,
+          stagger: 0.05,
+          ease: "back.out(2)",
+          scrollTrigger: {
+            trigger: heading,
+            start: "top 85%",
+          },
+        }
+      );
+
+      // Terminal slide in from right with 3D rotation
+      gsap.fromTo(
+        terminal,
+        { x: 200, opacity: 0, rotateY: -20 },
+        {
+          x: 0,
+          opacity: 1,
+          rotateY: 0,
+          duration: 1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: terminal,
+            start: "top 80%",
+          },
+        }
+      );
+
+      // Buttons stagger from left
+      const buttonElements = buttons.querySelectorAll("button");
+      gsap.fromTo(
+        buttonElements,
+        { x: -100, opacity: 0, scale: 0.9 },
+        {
+          x: 0,
+          opacity: 1,
+          scale: 1,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: buttons,
+            start: "top 80%",
+          },
+        }
+      );
+    });
+
+    return () => ctx.revert();
+  }, []);
+
+  // Typing effect
   useEffect(() => {
     const el = outputRef.current;
     if (!el) return;
 
-    // kill previous tween
     typingTl.current?.kill();
 
-    // If no question selected, show the current random AI/ML fact
     if (activeIndex === null) {
       el.textContent = currentFact;
       if (cmdRef.current) cmdRef.current.textContent = "";
@@ -89,14 +160,9 @@ export default function FAQSection() {
     }
 
     const full = faqs[activeIndex].output;
-
-    // small object to tween a numeric index
     const obj = { i: 0 };
-    // clear immediately
     el.textContent = "";
 
-    // duration proportional to length (faster)
-    // reduced per-character time so typing feels snappier
     const duration = Math.max(0.35, full.length * 0.018);
 
     typingTl.current = gsap.to(obj, {
@@ -109,7 +175,6 @@ export default function FAQSection() {
       },
     });
 
-    // animate command line flash and set command text
     if (cmdRef.current) {
       cmdRef.current.textContent = `$ ${faqs[activeIndex].command}`;
       gsap.fromTo(
@@ -124,24 +189,48 @@ export default function FAQSection() {
     };
   }, [activeIndex, currentFact]);
 
+  // Split text helper
+  const splitText = (text: string, className = "") => {
+    return text.split("").map((char, i) => (
+      <span
+        key={i}
+        className={`char inline-block ${className}`}
+        style={{ transformStyle: "preserve-3d" }}
+      >
+        {char === " " ? "\u00A0" : char}
+      </span>
+    ));
+  };
+
   return (
     <section
+      ref={sectionRef}
       id="faq"
       className="min-h-screen px-6 md:px-12 py-20 text-white"
     >
       {/* Heading */}
-      {/* Heading */}
-      <h2 className="mb-20 text-center text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-wide uppercase">
-        <span className="text-[#CCFF00]">FAQ</span>S
+      <h2
+        ref={headingRef}
+        className="mb-20 text-center text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-wide uppercase"
+        style={{ perspective: "1000px" }}
+      >
+        <span className="text-[#CCFF00]">{splitText("FAQ")}</span>
+        {splitText("S")}
       </h2>
 
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:gap-8 md:[grid-template-columns:auto_1fr]">
-        {/* Terminal Output - Shows FIRST on mobile, RIGHT on desktop */}
-        <div className="border border-white/20 bg-black order-first md:order-last">
-          {/* Terminal Header */}
+      <div
+        className="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:gap-8 md:[grid-template-columns:auto_1fr]"
+        style={{ perspective: "1200px" }}
+      >
+        {/* Terminal Output */}
+        <div
+          ref={terminalRef}
+          className="border border-white/20 bg-black/90 backdrop-blur-sm order-first md:order-last"
+          style={{ transformStyle: "preserve-3d" }}
+        >
           <div className="flex items-center justify-between border-b border-white/20 px-4 py-2">
             <div className="flex gap-2 flex-shrink-0">
-              <span className="h-3 w-3 rounded-full bg-red-500" />
+              <span className="h-3 w-3 rounded-full bg-red-500 animate-pulse" />
               <span className="h-3 w-3 rounded-full bg-yellow-400" />
               <span className="h-3 w-3 rounded-full bg-green-500" />
             </div>
@@ -153,7 +242,6 @@ export default function FAQSection() {
             </span>
           </div>
 
-          {/* Terminal Body */}
           <div className="min-h-[200px] md:min-h-[260px] px-6 py-5 font-mono text-sm leading-relaxed">
             <p ref={cmdRef} className="mb-3 text-[#CCFF00]">
               {activeIndex !== null ? `$ ${faqs[activeIndex].command}` : ""}
@@ -166,11 +254,11 @@ export default function FAQSection() {
           </div>
         </div>
 
-        {/* Command List - Shows SECOND on mobile, LEFT on desktop */}
+        {/* Command List */}
         <div
+          ref={buttonsRef}
           className="space-y-4 md:space-y-10 w-full md:max-w-xs order-last md:order-first"
           onClick={(e) => {
-            // clicking empty area of the left column shows a new random fact
             if (e.target === e.currentTarget) {
               setActiveIndex(null);
               setCurrentFact(randomFact());
@@ -182,17 +270,16 @@ export default function FAQSection() {
               key={index}
               onClick={() => {
                 if (activeIndex === index) {
-                  // re-clicking the already active question shows a new random fact
                   setActiveIndex(null);
                   setCurrentFact(randomFact());
                 } else {
                   setActiveIndex(index);
                 }
               }}
-              className={`group w-full border px-5 py-3 md:py-4 text-left font-mono text-sm transition
+              className={`group w-full border px-5 py-3 md:py-4 text-left font-mono text-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg
                 ${activeIndex === index
-                  ? "border-[#CCFF00] text-[#CCFF00]"
-                  : "border-white/20 text-white/80 hover:border-[#CCFF00]/50 hover:text-white"
+                  ? "border-[#CCFF00] text-[#CCFF00] shadow-[0_0_20px_rgba(204,255,0,0.2)]"
+                  : "border-white/20 text-white/80 hover:border-[#CCFF00]/50 hover:text-white hover:shadow-[0_0_15px_rgba(204,255,0,0.1)]"
                 }
               `}
             >
