@@ -85,7 +85,7 @@ export default function SubmitPage() {
 
   return (
     <>
-      <Navbar isLoggedIn={true} />
+      <Navbar />
       <main className="min-h-screen w-full bg-black pt-24 px-6 md:px-12 font-mono">
         <div className="max-w-4xl mx-auto">
           {/* HEADER */}

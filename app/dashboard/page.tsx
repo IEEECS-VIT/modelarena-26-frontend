@@ -1,57 +1,39 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import DashboardSection from "@/components/DashboardSection";
 
 export default function DashboardPage() {
-    const [user, setUser] = useState<any>(null);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+    const { user, isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data }) => {
-            if (!data.session) {
-                router.push("/");
-            } else {
-                setIsLoggedIn(true);
-                setUser(data.session.user);
-            }
-            setIsLoading(false);
-        });
-
-        const { data: listener } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
-                if (!session) {
-                    router.push("/");
-                } else {
-                    setIsLoggedIn(true);
-                    setUser(session.user);
-                }
-            }
-        );
-
-        return () => listener.subscription.unsubscribe();
-    }, [router]);
+        if (!isLoading && !isAuthenticated) {
+            router.push("/");
+        }
+    }, [isLoading, isAuthenticated, router]);
 
     if (isLoading) {
-        return <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>;
+        return (
+            <div className="min-h-screen bg-black flex items-center justify-center text-white">
+                Loading...
+            </div>
+        );
     }
 
-    if (!isLoggedIn) {
+    if (!isAuthenticated) {
         return null;
     }
 
     return (
         <>
-            <Navbar isLoggedIn={true} />
+            <Navbar />
             <main className="h-screen w-full overflow-hidden relative">
                 <DashboardSection user={user} />
             </main>
-
         </>
     );
 }

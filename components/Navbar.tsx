@@ -2,16 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 import { robotoMono } from "@/lib/fonts";
 import { RiMenu3Line, RiCloseLine } from "react-icons/ri";
 
-export default function Navbar({
-  isLoggedIn,
-}: {
-  isLoggedIn: boolean;
-}) {
+export default function Navbar() {
   const pathname = usePathname();
+  const { isAuthenticated, login, logout } = useAuth();
   const [active, setActive] = useState<string>("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -26,7 +23,7 @@ export default function Navbar({
   }, [pathname]);
 
   const scrollTo = (id: string) => {
-    setIsMenuOpen(false); // Close menu on click
+    setIsMenuOpen(false);
     if (pathname !== "/") {
       window.location.href = `/#${id}`;
       return;
@@ -38,22 +35,14 @@ export default function Navbar({
     el.scrollIntoView({ behavior: "smooth" });
   };
 
-  const login = async () => {
+  const handleLogin = async () => {
     setIsMenuOpen(false);
-    // Set flag to skip preloader after OAuth redirect
-    sessionStorage.setItem("internalNavigation", "true");
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: location.origin },
-    });
+    await login();
   };
 
-  const logout = async () => {
+  const handleLogout = async () => {
     setIsMenuOpen(false);
-    // Set flag to skip preloader after logout
-    sessionStorage.setItem("internalNavigation", "true");
-    await supabase.auth.signOut();
-    location.reload();
+    await logout();
   };
 
   useEffect(() => {
@@ -61,7 +50,7 @@ export default function Navbar({
       return;
     }
 
-  const ids = ["home", "about", "timeline", "faq"];
+    const ids = ["home", "about", "timeline", "faq"];
     const elements = ids.map((id) => document.getElementById(id)).filter(Boolean) as HTMLElement[];
     if (!elements.length) return;
 
@@ -118,7 +107,7 @@ export default function Navbar({
             )}
           </button>
 
-          {isLoggedIn && (
+          {isAuthenticated && (
             <button
               onClick={() => {
                 if (pathname === '/dashboard') return;
@@ -159,16 +148,16 @@ export default function Navbar({
 
         {/* DESKTOP AUTH */}
         <div className="hidden md:block">
-          {!isLoggedIn ? (
+          {!isAuthenticated ? (
             <button
-              onClick={login}
+              onClick={handleLogin}
               className="relative bg-[#CCFF00] px-5 py-2 text-sm font-bold tracking-widest text-black transition-all duration-200 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.9)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]"
             >
               LOGIN
             </button>
           ) : (
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="relative bg-[#CCFF00] px-5 py-2 text-sm font-bold tracking-widest text-black transition-all duration-200 shadow-[3px_3px_0px_0px_rgba(255,255,255,0.9)] hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px]"
             >
               LOGOUT
@@ -231,7 +220,7 @@ export default function Navbar({
             ABOUT
           </button>
 
-          {isLoggedIn && (
+          {isAuthenticated && (
             <button
               onClick={() => {
                 if (pathname === '/dashboard') {
@@ -261,16 +250,16 @@ export default function Navbar({
           </button>
 
           <div className="pt-8">
-            {!isLoggedIn ? (
+            {!isAuthenticated ? (
               <button
-                onClick={login}
+                onClick={handleLogin}
                 className="bg-[#CCFF00] px-8 py-3 text-sm font-bold tracking-widest text-black shadow-[3px_3px_0px_0px_white] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
               >
                 LOGIN
               </button>
             ) : (
               <button
-                onClick={logout}
+                onClick={handleLogout}
                 className="bg-[#CCFF00] px-8 py-3 text-sm font-bold tracking-widest text-black shadow-[3px_3px_0px_0px_white] active:shadow-none active:translate-x-[3px] active:translate-y-[3px]"
               >
                 LOGOUT
@@ -282,4 +271,3 @@ export default function Navbar({
     </nav>
   );
 }
-

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import dynamic from "next/dynamic";
-import { supabase } from "../lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
 
 import Navbar from "../components/Navbar";
 import Preloader from "../components/Preloader";
@@ -26,59 +26,34 @@ const Hero3D = dynamic(() => import("../components/Hero3D"), {
 });
 
 export default function LandingPage() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   usePremiumScrollEffects();
 
+  // Check for auth errors from callback
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setIsLoggedIn(!!data.session);
-    });
+    const params = new URLSearchParams(window.location.search);
+    const errorParam = params.get("error");
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        setIsLoggedIn(!!session);
-
-        // // Call /api/user on sign in to check if user is registered on VTOP
-        // if (event === "SIGNED_IN" && session) {
-        //   try {
-        //     const response = await fetch("/api/user", {
-        //       method: "POST",
-        //       headers: {
-        //         "Authorization": `Bearer ${session.access_token}`,
-        //         "Content-Type": "application/json",
-        //       },
-        //     });
-
-        //     if (!response.ok) {
-        //       let errorMessage = "Authentication failed";
-        //       try {
-        //         const errorData = await response.json();
-        //         errorMessage = errorData.error || errorMessage;
-        //       } catch {
-        //         // Response wasn't JSON, use status text
-        //         errorMessage = response.statusText || errorMessage;
-        //       }
-        //       // Sign out the user and show backend error message
-        //       await supabase.auth.signOut();
-        //       alert(errorMessage);
-        //     }
-        //   } catch (error) {
-        //     console.error("Failed to check user registration:", error);
-        //     // Don't crash the app, just log the error
-        //   }
-        // }
+    if (errorParam) {
+      let message = "Login failed. Please try again.";
+      if (errorParam === "not_registered") {
+        message = "Your email is not registered on VTOP. Please register on VTOP first.";
+      } else if (errorParam === "verification_failed") {
+        message = "Could not verify your account. Please try again.";
       }
-    );
 
-    return () => {
-      listener.subscription.unsubscribe();
-    };
+      // Show toast or alert
+      alert(message);
+
+      // Clear the error from URL
+      window.history.replaceState({}, document.title, "/");
+    }
   }, []);
 
   return (
     <>
-      <Navbar isLoggedIn={isLoggedIn} />
+      <Navbar />
       <Preloader />
 
       <main className="scroll-smooth">
@@ -137,7 +112,7 @@ export default function LandingPage() {
               <ScaleReveal from={0.8} delay={0.7}>
                 <button
                   onClick={() => {
-                    if (isLoggedIn) {
+                    if (isAuthenticated) {
                       window.location.href = "/dashboard";
                     } else {
                       window.open("https://vtop.vit.ac.in", "_blank");
@@ -145,7 +120,7 @@ export default function LandingPage() {
                   }}
                   className="mt-8 bg-[#CCFF00] px-6 py-2.5 text-sm font-bold tracking-widest text-black uppercase transition-all duration-300 shadow-[4px_4px_0px_0px_rgba(255,255,255,0.9)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] hover:scale-105"
                 >
-                  {isLoggedIn ? "DASHBOARD" : "REGISTER NOW"}
+                  {isAuthenticated ? "DASHBOARD" : "REGISTER NOW"}
                 </button>
               </ScaleReveal>
             </div>
@@ -172,7 +147,7 @@ export default function LandingPage() {
             <AboutSection />
           </ClipReveal>
         </section>
-        
+
         {/* ========== TIMELINE SECTION ========== */}
         <section id="timeline">
           <ClipReveal direction="bottom">
