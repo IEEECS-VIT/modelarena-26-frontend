@@ -7,9 +7,6 @@ import Lenis from "lenis";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// ============================================
-// LENIS SMOOTH SCROLL - Butter smooth experience
-// ============================================
 export function useSmoothScroll() {
     useEffect(() => {
         const lenis = new Lenis({

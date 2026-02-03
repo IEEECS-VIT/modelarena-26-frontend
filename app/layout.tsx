@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { sora } from "@/lib/fonts";
 import { AuthProvider } from "@/hooks/useAuth";
+import { ToastProvider } from "@/components/Toast";
 
 export const metadata: Metadata = {
   title: "ModelArena | IEEECS-VIT",
@@ -19,7 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={sora.className}>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </AuthProvider>
       </body>
     </html>
   );

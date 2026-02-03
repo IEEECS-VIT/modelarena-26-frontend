@@ -5,39 +5,45 @@ import { RiFileCopyLine } from "react-icons/ri";
 import Link from "next/link";
 
 interface TeamMember {
-  name: string;
-  isRoot?: boolean;
+  email: string;
+  name: string | null;
+  regNo: string | null;
+  isTeamLeader: boolean;
 }
 
 interface TeamCardProps {
   team: {
+    teamId?: string;
     teamName: string;
-    captain: string;
     teamCode: string;
-    regNo: string;
-    members?: TeamMember[];
+    currentScore?: number;
+    leaderEmail?: string;
+    members: TeamMember[];
+    memberCount?: number;
+    createdAt?: string;
   };
   onLeave?: () => void;
 }
 
 export default function TeamCard({ team, onLeave }: TeamCardProps) {
   const [copied, setCopied] = useState(false);
-  const [logs, setLogs] = useState([
-    { time: "10:42", message: `User (${team.captain}) created cluster.` },
-    { time: "10:42", message: "Invite token generated." },
-  ]);
 
-  const members: TeamMember[] = team.members || [
-    { name: team.captain, isRoot: true },
-  ];
-
-  // Fill remaining slots (max 4 members)
-  const emptySlots = 4 - members.length;
+  const members = team.members || [];
+  const maxMembers = 3;
+  const emptySlots = Math.max(0, maxMembers - members.length);
 
   const copyToken = () => {
     navigator.clipboard.writeText(team.teamCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return "N/A";
+    return new Date(dateStr).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   return (
@@ -70,7 +76,7 @@ export default function TeamCard({ team, onLeave }: TeamCardProps) {
       </div>
 
       {/* MEMBER CARDS */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         {/* SVG Gradient Definition */}
         <svg width="0" height="0" className="absolute">
           <defs>
@@ -84,10 +90,10 @@ export default function TeamCard({ team, onLeave }: TeamCardProps) {
         {/* Existing members */}
         {members.map((member, index) => (
           <div
-            key={index}
+            key={member.email || index}
             className="relative bg-neutral-900 border border-[#9333EA]/50 rounded-lg p-4 min-h-[200px] flex flex-col items-center justify-center shadow-[0_0_20px_rgba(147,51,234,0.15)]"
           >
-            {member.isRoot && (
+            {member.isTeamLeader && (
               <span className="absolute top-2 right-2 text-xs text-[#CCFF00] border border-[#CCFF00]/50 px-2 py-0.5 rounded">
                 [ROOT_USER]
               </span>
@@ -120,9 +126,14 @@ export default function TeamCard({ team, onLeave }: TeamCardProps) {
               </svg>
             </div>
 
-            <span className="text-white tracking-widest text-sm">
-              &gt;{member.name.toUpperCase()}
+            <span className="text-white tracking-widest text-sm text-center">
+              &gt;{(member.name || member.email.split("@")[0]).toUpperCase()}
             </span>
+            {member.regNo && (
+              <span className="text-white/50 text-xs tracking-wider mt-1">
+                [{member.regNo}]
+              </span>
+            )}
           </div>
         ))}
 
@@ -174,11 +185,17 @@ export default function TeamCard({ team, onLeave }: TeamCardProps) {
           </div>
 
           <div className="space-y-1 text-xs">
-            {logs.map((log, index) => (
-              <p key={index} className="text-white/60">
-                <span className="text-white/40">[{log.time}]</span> {log.message}
+            <p className="text-white/60">
+              <span className="text-white/40">[{formatDate(team.createdAt)}]</span> Cluster initialized.
+            </p>
+            <p className="text-white/60">
+              <span className="text-white/40">[{formatDate(team.createdAt)}]</span> {members.length}/{maxMembers} nodes connected.
+            </p>
+            {team.currentScore !== undefined && team.currentScore > 0 && (
+              <p className="text-white/60">
+                <span className="text-white/40">[SCORE]</span> {team.currentScore} pts
               </p>
-            ))}
+            )}
           </div>
         </div>
       </div>

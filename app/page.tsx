@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import dynamic from "next/dynamic";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/components/Toast";
 
 import Navbar from "../components/Navbar";
 import Preloader from "../components/Preloader";
@@ -27,6 +28,7 @@ const Hero3D = dynamic(() => import("../components/Hero3D"), {
 
 export default function LandingPage() {
   const { isAuthenticated } = useAuth();
+  const { toast } = useToast();
 
   usePremiumScrollEffects();
 
@@ -36,20 +38,13 @@ export default function LandingPage() {
     const errorParam = params.get("error");
 
     if (errorParam) {
-      let message = "Login failed. Please try again.";
-      if (errorParam === "not_registered") {
-        message = "Your email is not registered on VTOP. Please register on VTOP first.";
-      } else if (errorParam === "verification_failed") {
-        message = "Could not verify your account. Please try again.";
-      }
-
-      // Show toast or alert
-      alert(message);
+      // Show toast notification with the actual error message from backend
+      toast.error(decodeURIComponent(errorParam));
 
       // Clear the error from URL
       window.history.replaceState({}, document.title, "/");
     }
-  }, []);
+  }, [toast]);
 
   return (
     <>

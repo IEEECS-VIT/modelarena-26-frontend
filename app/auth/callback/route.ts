@@ -32,8 +32,10 @@ export async function GET(request: Request) {
 
         if (!response.ok) {
             // User not registered on VTOP - sign them out
+            const errorData = await response.json().catch(() => ({ error: 'Authentication failed' }))
+            const errorMessage = encodeURIComponent(errorData.error || 'Authentication failed')
             await supabase.auth.signOut()
-            return NextResponse.redirect(`${origin}/?error=not_registered`)
+            return NextResponse.redirect(`${origin}/?error=${errorMessage}`)
         }
 
         // User verified! Redirect to dashboard

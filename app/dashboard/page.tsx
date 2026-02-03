@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import DashboardSection from "@/components/DashboardSection";
 
 export default function DashboardPage() {
-    const { user, isAuthenticated, isLoading } = useAuth();
+    const { user, session, isAuthenticated, isLoading } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -32,8 +32,9 @@ export default function DashboardPage() {
         <>
             <Navbar />
             <main className="h-screen w-full overflow-hidden relative">
-                <DashboardSection user={user} />
+                <DashboardSection user={user} session={session} />
             </main>
         </>
     );
 }
+

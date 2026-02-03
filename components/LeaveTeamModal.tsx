@@ -1,11 +1,15 @@
 "use client";
 
+import { RiLoader4Line } from "react-icons/ri";
+
 export default function LeaveTeamModal({
   onClose,
   onConfirm,
+  isLoading = false,
 }: {
   onClose: () => void;
   onConfirm: () => void;
+  isLoading?: boolean;
 }) {
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
@@ -21,15 +25,18 @@ export default function LeaveTeamModal({
         <div className="flex justify-end gap-4">
           <button
             onClick={onClose}
-            className="px-6 py-3 border border-[#CCFF00]/50 text-[#CCFF00] rounded tracking-widest hover:bg-[#CCFF00]/10 transition"
+            disabled={isLoading}
+            className="px-6 py-3 border border-[#CCFF00]/50 text-[#CCFF00] rounded tracking-widest hover:bg-[#CCFF00]/10 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             &gt; ABORT
           </button>
 
           <button
             onClick={onConfirm}
-            className="px-6 py-3 bg-red-600 text-white rounded tracking-widest hover:bg-red-700 transition"
+            disabled={isLoading}
+            className="px-6 py-3 bg-red-600 text-white rounded tracking-widest hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
+            {isLoading && <RiLoader4Line className="w-4 h-4 animate-spin" />}
             &gt; CONFIRM
           </button>
         </div>

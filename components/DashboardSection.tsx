@@ -3,17 +3,44 @@
 import { useState, useEffect, useRef } from "react";
 import TeamCard from "./TeamCard";
 import LeaveTeamModal from "./LeaveTeamModal";
-import { RiLinkM } from "react-icons/ri";
+import { RiLinkM, RiLoader4Line } from "react-icons/ri";
 import gsap from "gsap";
+import { useToast } from "./Toast";
 
 interface DashboardSectionProps {
   user?: any;
+  session?: any;
 }
 
-export default function DashboardSection({ user }: DashboardSectionProps) {
+interface TeamMember {
+  email: string;
+  name: string | null;
+  regNo: string | null;
+  isTeamLeader: boolean;
+}
+
+interface TeamData {
+  teamId: string;
+  teamName: string;
+  teamCode: string;
+  currentScore: number;
+  leaderEmail: string;
+  members: TeamMember[];
+  memberCount: number;
+  createdAt: string;
+}
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+export default function DashboardSection({ user, session }: DashboardSectionProps) {
+  const { toast } = useToast();
   const [showLeaveModal, setShowLeaveModal] = useState(false);
-  const [hasTeam, setHasTeam] = useState(false);
-  const [teamData, setTeamData] = useState<any>(null);
+  const [hasTeam, setHasTeam] = useState<boolean | null>(null);
+  const [teamData, setTeamData] = useState<TeamData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
 
   // Inline input states
   const [teamName, setTeamName] = useState("");
@@ -21,15 +48,205 @@ export default function DashboardSection({ user }: DashboardSectionProps) {
 
   const headingRef = useRef<HTMLHeadingElement>(null);
 
+  // Get access token
+  const getAccessToken = (): string | null => {
+    if (session?.access_token) return session.access_token;
+    const storedSession = localStorage.getItem("modelarena_session");
+    if (storedSession) {
+      try {
+        const parsed = JSON.parse(storedSession);
+        return parsed.access_token;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  };
+
+  // Fetch user data to check hasTeam status
+  const fetchUserData = async () => {
+    const token = getAccessToken();
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/user`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        setHasTeam(userData.hasTeam || false);
+
+        if (userData.hasTeam) {
+          await fetchTeamDetails();
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch team details
+  const fetchTeamDetails = async () => {
+    const token = getAccessToken();
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${API_URL}/team`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          setTeamData(result.data);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching team details:", error);
+    }
+  };
+
+  // Create team
+  const handleCreateTeam = async () => {
+    if (!teamName.trim()) return;
+
+    const token = getAccessToken();
+    if (!token) {
+      toast.error("Please log in to create a team");
+      return;
+    }
+
+    setIsCreating(true);
+    try {
+      const response = await fetch(`${API_URL}/team/create`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ teamName: teamName.trim() }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        toast.success(result.message || "Team created successfully!");
+        setHasTeam(true);
+        setTeamName("");
+        await fetchTeamDetails();
+      } else {
+        toast.error(result.message || "Failed to create team");
+      }
+    } catch (error) {
+      console.error("Create team error:", error);
+      toast.error("Failed to create team. Please try again.");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  // Join team
+  const handleJoinTeam = async () => {
+    if (!joinCode.trim()) return;
+
+    const token = getAccessToken();
+    if (!token) {
+      toast.error("Please log in to join a team");
+      return;
+    }
+
+    setIsJoining(true);
+    try {
+      const response = await fetch(`${API_URL}/team/join`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ teamCode: joinCode.trim().toUpperCase() }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        toast.success(result.message || "Successfully joined the team!");
+        setHasTeam(true);
+        setJoinCode("");
+        await fetchTeamDetails();
+      } else {
+        toast.error(result.message || "Failed to join team");
+      }
+    } catch (error) {
+      console.error("Join team error:", error);
+      toast.error("Failed to join team. Please try again.");
+    } finally {
+      setIsJoining(false);
+    }
+  };
+
+  // Leave team
+  const handleLeaveTeam = async () => {
+    const token = getAccessToken();
+    if (!token) {
+      toast.error("Please log in to leave the team");
+      return;
+    }
+
+    setIsLeaving(true);
+    try {
+      const response = await fetch(`${API_URL}/team/leave`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        toast.success(result.message || "Successfully left the team");
+        setHasTeam(false);
+        setTeamData(null);
+        setShowLeaveModal(false);
+      } else {
+        toast.error(result.message || "Failed to leave team");
+      }
+    } catch (error) {
+      console.error("Leave team error:", error);
+      toast.error("Failed to leave team. Please try again.");
+    } finally {
+      setIsLeaving(false);
+    }
+  };
+
+  // Initial fetch
   useEffect(() => {
-    if (headingRef.current && user) {
+    fetchUserData();
+  }, [session]);
+
+  // Welcome animation
+  useEffect(() => {
+    if (headingRef.current && user && !hasTeam) {
       const name = user.user_metadata?.full_name || user.email?.split("@")[0] || "USER";
       const finalText = `WELCOME, ${name.toUpperCase()}`;
 
-      // Clear previous content
       headingRef.current.innerHTML = "";
 
-      // Split text into characters for individual animation
       const chars = finalText.split("");
       chars.forEach((char) => {
         const span = document.createElement("span");
@@ -38,12 +255,10 @@ export default function DashboardSection({ user }: DashboardSectionProps) {
         span.style.filter = "blur(10px)";
         span.style.transform = "translateY(10px)";
         span.style.display = "inline-block";
-        // preserve spaces
         if (char === " ") span.style.width = "0.5em";
         headingRef.current?.appendChild(span);
       });
 
-      // Animate: Blur -> Clear, Opacity 0 -> 1, Y 10 -> 0
       gsap.to(headingRef.current.children, {
         opacity: 1,
         filter: "blur(0px)",
@@ -53,7 +268,18 @@ export default function DashboardSection({ user }: DashboardSectionProps) {
         ease: "power2.out",
       });
     }
-  }, [user]);
+  }, [user, hasTeam]);
+
+  if (isLoading) {
+    return (
+      <section className="h-full w-full flex items-center justify-center bg-transparent">
+        <div className="flex items-center gap-3 text-white/70">
+          <RiLoader4Line className="w-6 h-6 animate-spin" />
+          <span className="font-mono tracking-widest">LOADING_DATA...</span>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -88,23 +314,15 @@ export default function DashboardSection({ user }: DashboardSectionProps) {
                 onChange={(e) => setTeamName(e.target.value)}
                 placeholder="Enter_Team_Name..."
                 className="w-full bg-neutral-800 border border-[#CCFF00]/40 text-white px-4 py-2 rounded mb-6 placeholder:text-white/40 focus:outline-none focus:border-[#CCFF00]"
+                disabled={isCreating}
               />
 
               <button
-                onClick={() => {
-                  if (!teamName.trim()) return;
-                  setTeamData({
-                    teamName: teamName,
-                    captain: "You",
-                    teamCode: "ABC123",
-                    regNo: "REG-001",
-                  });
-                  setHasTeam(true);
-                  setTeamName("");
-                }}
-                disabled={!teamName.trim()}
-                className="w-full bg-[#CCFF00] text-black py-4 rounded font-semibold tracking-widest hover:bg-[#b8e600] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleCreateTeam}
+                disabled={!teamName.trim() || isCreating}
+                className="w-full bg-[#CCFF00] text-black py-4 rounded font-semibold tracking-widest hover:bg-[#b8e600] transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
+                {isCreating && <RiLoader4Line className="w-5 h-5 animate-spin" />}
                 &gt; EXECUTE_CREATE
               </button>
             </div>
@@ -122,26 +340,19 @@ export default function DashboardSection({ user }: DashboardSectionProps) {
 
               <input
                 value={joinCode}
-                onChange={(e) => setJoinCode(e.target.value)}
+                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                 placeholder="Paste_Code_Here..."
-                className="w-full bg-neutral-800 border border-[#CCFF00]/40 text-white px-4 py-2 rounded mb-6 placeholder:text-white/40 focus:outline-none focus:border-[#CCFF00]"
+                maxLength={6}
+                className="w-full bg-neutral-800 border border-[#CCFF00]/40 text-white px-4 py-2 rounded mb-6 placeholder:text-white/40 focus:outline-none focus:border-[#CCFF00] uppercase"
+                disabled={isJoining}
               />
 
               <button
-                onClick={() => {
-                  if (!joinCode.trim()) return;
-                  setTeamData({
-                    teamName: "Joined Team",
-                    captain: "Captain Name",
-                    teamCode: joinCode,
-                    regNo: "REG-002",
-                  });
-                  setHasTeam(true);
-                  setJoinCode("");
-                }}
-                disabled={!joinCode.trim()}
-                className="w-full border border-white text-white py-4 rounded tracking-widest hover:bg-white hover:text-black transition disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleJoinTeam}
+                disabled={!joinCode.trim() || isJoining}
+                className="w-full border border-white text-white py-4 rounded tracking-widest hover:bg-white hover:text-black transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
+                {isJoining && <RiLoader4Line className="w-5 h-5 animate-spin" />}
                 &gt; CONNECT
               </button>
             </div>
@@ -149,7 +360,7 @@ export default function DashboardSection({ user }: DashboardSectionProps) {
         )}
 
         {/* TEAM EXISTS */}
-        {hasTeam && (
+        {hasTeam && teamData && (
           <div className="w-full">
             <TeamCard
               team={teamData}
@@ -161,11 +372,8 @@ export default function DashboardSection({ user }: DashboardSectionProps) {
         {showLeaveModal && (
           <LeaveTeamModal
             onClose={() => setShowLeaveModal(false)}
-            onConfirm={() => {
-              setHasTeam(false);
-              setTeamData(null);
-              setShowLeaveModal(false);
-            }}
+            onConfirm={handleLeaveTeam}
+            isLoading={isLeaving}
           />
         )}
       </div>
