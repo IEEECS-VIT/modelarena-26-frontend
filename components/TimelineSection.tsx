@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { robotoMono } from "@/lib/fonts";
-import { RiFlag2Fill, RiRocket2Fill, RiCalendarEventFill, RiTrophyFill } from "react-icons/ri";
+import { RiFlag2Fill, RiRocket2Fill, RiCalendarEventFill, RiTrophyFill, RiSpeaker2Fill, RiMic2Fill } from "react-icons/ri";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -10,35 +10,46 @@ gsap.registerPlugin(ScrollTrigger);
 
 const events = [
   {
-    title: "Registrations Open",
-    date: "Jan 25, 2026",
-    description: "Team registrations begin. Gather your squad and sign up!",
+    title: "Hack Begins!",
+    date: "Feb 07, 2026",
+    description: "The first challenge is released. Start building your models!",
     icon: RiFlag2Fill,
     step: "01",
     active: true,
   },
   {
-    title: "Round 1 Begins",
-    date: "Feb 08, 2026",
-    description: "The first challenge is released. Start building your models.",
-    icon: RiRocket2Fill,
+    title: "Guest Speaker",
+    date: "Feb 07, 2026",
+    description: "Industry expert session right after the hack begins to set context and inspiration.",
+    icon: RiMic2Fill,
     step: "02",
-    active: false,
+    active: true,
   },
   {
-    title: "Final Submission",
-    date: "Feb 10, 2026",
-    description: "Deadline for all submissions. Make sure everything is polished.",
-    icon: RiCalendarEventFill,
+    title: "Review 1 (Post Lunch)",
+    date: "Feb 07, 2026",
+    description:
+      "First review checkpoint after lunch to assess progress and direction.",
+    icon: RiRocket2Fill,
     step: "03",
     active: false,
   },
+   {
+    title: "Review 2 (Overnight)",
+    date: "Feb 08, 2026",
+    description:
+      "Overnight review to track stability, improvements, and final adjustments.",
+    icon: RiRocket2Fill,
+    step: "04",
+    active: false,
+  },
+ 
   {
     title: "Results Announced",
-    date: "Feb 12, 2026",
+    date: "Feb 8, 2026",
     description: "Winners are revealed and prizes distributed.",
     icon: RiTrophyFill,
-    step: "04",
+    step: "05",
     active: false,
   },
 ];
@@ -206,7 +217,7 @@ export default function TimelineSection() {
                   className={`absolute ${isUp ? "bottom-full mb-8" : "top-full mt-8"} w-full`}
                 >
                   <div
-                    className={`p-5 h-[180px] border transition-all duration-500 backdrop-blur-sm ${event.active
+                    className={`p-5 h-[240px] border transition-all duration-500 backdrop-blur-sm ${event.active
                         ? "bg-[#CCFF00]/10 border-[#CCFF00] shadow-[0_0_40px_rgba(204,255,0,0.25)]"
                         : "bg-white/[0.02] border-white/10 hover:border-[#CCFF00]/50 hover:bg-white/[0.05] hover:shadow-[0_0_30px_rgba(204,255,0,0.1)]"
                       }`}
@@ -237,7 +248,7 @@ export default function TimelineSection() {
                       {event.title}
                     </h3>
 
-                    <p className="text-white/50 text-sm leading-relaxed line-clamp-3">
+                    <p className="text-white/50 text-sm leading-relaxed">
                       {event.description}
                     </p>
                   </div>
