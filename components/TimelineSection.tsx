@@ -11,32 +11,56 @@ gsap.registerPlugin(ScrollTrigger);
 const events = [
   {
     title: "Registrations Open",
-    date: "Jan 25, 2026",
+    date: "Feb 07, 2026 8:00 AM",
     description: "Team registrations begin. Gather your squad and sign up!",
     icon: RiFlag2Fill,
     step: "01",
     active: true,
   },
   {
-    title: "Round 1 Begins",
-    date: "Feb 08, 2026",
-    description: "The first challenge is released. Start building your models.",
+    title: "Hack Begins",
+    date: "Feb 07, 2026",
+    description: "Where the participants start their journey.",
     icon: RiRocket2Fill,
     step: "02",
     active: false,
   },
   {
-    title: "Final Submission",
-    date: "Feb 10, 2026",
-    description: "Deadline for all submissions. Make sure everything is polished.",
+    title: "Guest speaker session",
+    date: "Feb 07, 2026 11:00 AM",
+    description: "An insightful discussion with an industry professional.",
+    icon: RiRocket2Fill,
+    step: "03",
+    active: false,
+  },
+  {
+    title: "Review 1",
+    date: "Feb 07, 2026 3:00 PM",
+    description: "The first review is conducted to evaluate the models.",
+    icon: RiRocket2Fill,
+    step: "04",
+    active: false,
+  },
+  {
+    title: "The hack resumes",
+    date: "Feb 07, 2026 9:00 PM",
+    description: "The hackathon resumes after a dinner break.",
     icon: RiCalendarEventFill,
     step: "03",
     active: false,
   },
   {
-    title: "Results Announced",
-    date: "Feb 12, 2026",
-    description: "Winners are revealed and prizes distributed.",
+    title: "Review 2",
+    date: "Feb 8, 2026 3:00 AM",
+    description: "The second review is conducted to evaluate the models.",
+    icon: RiTrophyFill,
+    step: "04",
+    active: false,
+  },
+  {
+    title: "The hacking ends",
+    date: "Feb 08, 2026 6:00 AM",
+    description: "The hacking ends.",
     icon: RiTrophyFill,
     step: "04",
     active: false,
@@ -189,8 +213,15 @@ export default function TimelineSection() {
 
       {/* Desktop Zigzag Timeline */}
       <div ref={cardsRef} className="hidden lg:block w-full max-w-6xl relative" style={{ perspective: "1200px" }}>
-        {/* Horizontal connecting line */}
-        <div ref={lineRef} className="absolute top-1/2 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#CCFF00]/50 to-transparent -translate-y-1/2" />
+        {/* Horizontal connecting line with glow */}
+        <div
+          ref={lineRef}
+          className="absolute top-1/2 left-0 right-0 h-[3px] -translate-y-1/2"
+          style={{
+            background: 'linear-gradient(90deg, transparent, rgba(204,255,0,0.8) 20%, rgba(204,255,0,0.8) 80%, transparent)',
+            boxShadow: '0 0 20px rgba(204,255,0,0.4)'
+          }}
+        />
 
         <div className="flex justify-between items-center relative">
           {events.map((event, idx) => {
@@ -199,65 +230,96 @@ export default function TimelineSection() {
               <div
                 key={idx}
                 className="relative flex flex-col items-center timeline-card"
-                style={{ width: "22%", transformStyle: "preserve-3d" }}
+                style={{ width: "28%", transformStyle: "preserve-3d" }}
               >
                 {/* Card */}
                 <div
-                  className={`absolute ${isUp ? "bottom-full mb-8" : "top-full mt-8"} w-full`}
+                  className={`absolute ${isUp ? "bottom-full mb-10" : "top-full mt-10"} w-full`}
                 >
                   <div
-                    className={`p-5 h-[180px] border transition-all duration-500 backdrop-blur-sm ${event.active
-                        ? "bg-[#CCFF00]/10 border-[#CCFF00] shadow-[0_0_40px_rgba(204,255,0,0.25)]"
-                        : "bg-white/[0.02] border-white/10 hover:border-[#CCFF00]/50 hover:bg-white/[0.05] hover:shadow-[0_0_30px_rgba(204,255,0,0.1)]"
-                      }`}
+                    className={`
+                      group relative p-6 pb-10 min-h-[280px] flex flex-col
+                      backdrop-blur-md transition-all duration-500
+                      ${event.active
+                        ? "bg-gradient-to-br from-[#CCFF00]/15 via-[#CCFF00]/10 to-transparent border-2 border-[#CCFF00] shadow-[0_0_50px_rgba(204,255,0,0.3),inset_0_0_30px_rgba(204,255,0,0.1)]"
+                        : "bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/10 hover:border-[#CCFF00]/60 hover:shadow-[0_0_40px_rgba(204,255,0,0.15),inset_0_0_20px_rgba(204,255,0,0.05)]"
+                      }
+                      hover:scale-[1.02] hover:-translate-y-1
+                    `}
                   >
-                    {/* Step Number */}
+                    {/* Corner accents */}
+                    <div className={`absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 transition-colors duration-300 ${event.active ? 'border-[#CCFF00]' : 'border-white/20 group-hover:border-[#CCFF00]/60'
+                      }`} />
+                    <div className={`absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 transition-colors duration-300 ${event.active ? 'border-[#CCFF00]' : 'border-white/20 group-hover:border-[#CCFF00]/60'
+                      }`} />
+
+                    {/* Step Number Badge */}
                     <div
-                      className={`absolute ${isUp ? "-bottom-3" : "-top-3"} right-4 w-8 h-8 flex items-center justify-center ${event.active ? "bg-[#CCFF00]" : "bg-white/20"
+                      className={`absolute ${isUp ? "-bottom-4" : "-top-4"} right-4 w-10 h-10 flex items-center justify-center transition-all duration-300 ${event.active
+                        ? "bg-gradient-to-br from-[#CCFF00] to-[#99CC00] shadow-[0_0_20px_rgba(204,255,0,0.6)]"
+                        : "bg-gradient-to-br from-white/20 to-white/10 group-hover:from-[#CCFF00]/50 group-hover:to-[#99CC00]/50"
                         }`}
+                      style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
                     >
                       <span
-                        className={`text-xs font-bold ${event.active ? "text-black" : "text-white"} ${robotoMono.className}`}
+                        className={`text-sm font-bold ${robotoMono.className} ${event.active ? "text-black" : "text-white group-hover:text-black"
+                          }`}
                       >
                         {event.step}
                       </span>
                     </div>
 
+                    {/* Date */}
                     <p
-                      className={`text-xs tracking-widest mb-2 ${robotoMono.className} ${event.active ? "text-[#CCFF00]" : "text-white/40"
+                      className={`text-xs tracking-[0.15em] mb-3 uppercase ${robotoMono.className} ${event.active ? "text-[#CCFF00]" : "text-white/40 group-hover:text-[#CCFF00]/70"
                         }`}
                     >
                       {event.date}
                     </p>
 
+                    {/* Title with gradient on active */}
                     <h3
-                      className={`text-lg font-bold mb-2 transition-colors ${event.active ? "text-[#CCFF00]" : "text-white"
+                      className={`text-base font-bold mb-3 leading-snug break-words transition-all duration-300 ${event.active
+                        ? "bg-gradient-to-r from-[#CCFF00] to-[#99FF00] bg-clip-text text-transparent"
+                        : "text-white group-hover:text-[#CCFF00]"
                         }`}
                     >
                       {event.title}
                     </h3>
 
-                    <p className="text-white/50 text-sm leading-relaxed line-clamp-3">
+                    {/* Description */}
+                    <p className="text-white/60 group-hover:text-white/80 text-sm leading-relaxed transition-colors duration-300 flex-1">
                       {event.description}
                     </p>
+
+                    {/* Subtle grid pattern overlay */}
+                    <div
+                      className="absolute inset-0 opacity-[0.02] pointer-events-none"
+                      style={{
+                        backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)'
+                      }}
+                    />
                   </div>
 
-                  {/* Connector line */}
+                  {/* Connector line with glow */}
                   <div
-                    className={`absolute left-1/2 -translate-x-1/2 w-[2px] h-8 ${event.active ? "bg-gradient-to-b from-[#CCFF00] to-transparent" : "bg-white/20"
+                    className={`absolute left-1/2 -translate-x-1/2 w-[3px] h-10 transition-all duration-300 ${event.active
+                      ? "bg-gradient-to-b from-[#CCFF00] to-transparent shadow-[0_0_15px_rgba(204,255,0,0.6)]"
+                      : "bg-gradient-to-b from-white/30 to-transparent"
                       } ${isUp ? "top-full" : "bottom-full"}`}
                   />
                 </div>
 
-                {/* Center Node */}
+                {/* Center Node with enhanced glow */}
                 <div
-                  className={`timeline-node w-12 h-12 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${event.active
-                      ? "bg-[#CCFF00] shadow-[0_0_30px_rgba(204,255,0,0.6)]"
-                      : "bg-black border-2 border-white/30 hover:border-[#CCFF00]/50"
+                  className={`timeline-node w-14 h-14 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${event.active
+                    ? "bg-gradient-to-br from-[#CCFF00] to-[#99CC00] shadow-[0_0_40px_rgba(204,255,0,0.8),0_0_60px_rgba(204,255,0,0.4)]"
+                    : "bg-gradient-to-br from-black to-gray-900 border-2 border-white/40 hover:border-[#CCFF00]/70 hover:shadow-[0_0_30px_rgba(204,255,0,0.4)]"
                     }`}
                 >
                   <event.icon
-                    className={`w-5 h-5 ${event.active ? "text-black" : "text-white/60"}`}
+                    className={`w-6 h-6 transition-all duration-300 ${event.active ? "text-black" : "text-white/70 group-hover:text-[#CCFF00]"
+                      }`}
                   />
                 </div>
               </div>
@@ -269,49 +331,81 @@ export default function TimelineSection() {
       {/* Mobile/Tablet Timeline */}
       <div className="lg:hidden w-full max-w-md">
         <div className="relative">
-          {/* Vertical line */}
-          <div className="vertical-line absolute left-6 top-0 bottom-0 w-[2px] bg-gradient-to-b from-[#CCFF00]/50 via-white/20 to-transparent" />
+          {/* Vertical line with glow */}
+          <div
+            className="vertical-line absolute left-6 top-0 bottom-0 w-[3px]"
+            style={{
+              background: 'linear-gradient(180deg, rgba(204,255,0,0.8), rgba(204,255,0,0.3) 60%, transparent)',
+              boxShadow: '0 0 20px rgba(204,255,0,0.3)'
+            }}
+          />
 
           <div className="flex flex-col gap-8">
             {events.map((event, idx) => (
               <div key={idx} className="relative flex items-start gap-6 timeline-card">
+                {/* Node */}
                 <div
-                  className={`timeline-node relative z-10 w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${event.active
-                      ? "bg-[#CCFF00] shadow-[0_0_25px_rgba(204,255,0,0.5)]"
-                      : "bg-black border-2 border-white/30"
+                  className={`timeline-node relative z-10 w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${event.active
+                    ? "bg-gradient-to-br from-[#CCFF00] to-[#99CC00] shadow-[0_0_35px_rgba(204,255,0,0.7)]"
+                    : "bg-gradient-to-br from-black to-gray-900 border-2 border-white/40"
                     }`}
                 >
                   <event.icon
-                    className={`w-5 h-5 ${event.active ? "text-black" : "text-white/60"}`}
+                    className={`w-6 h-6 ${event.active ? "text-black" : "text-white/70"}`}
                   />
                 </div>
 
+                {/* Card */}
                 <div
-                  className={`flex-1 p-5 border backdrop-blur-sm transition-all duration-300 ${event.active
-                      ? "bg-[#CCFF00]/10 border-[#CCFF00]"
-                      : "bg-white/[0.02] border-white/10"
-                    }`}
+                  className={`
+                    group flex-1 p-5 min-h-[140px] backdrop-blur-md transition-all duration-300 relative overflow-hidden
+                    ${event.active
+                      ? "bg-gradient-to-br from-[#CCFF00]/15 via-[#CCFF00]/10 to-transparent border-2 border-[#CCFF00] shadow-[0_0_40px_rgba(204,255,0,0.25)]"
+                      : "bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/10"
+                    }
+                  `}
                 >
-                  <div className="flex items-center justify-between mb-2">
+                  {/* Corner accents */}
+                  <div className={`absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 ${event.active ? 'border-[#CCFF00]' : 'border-white/20'
+                    }`} />
+                  <div className={`absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 ${event.active ? 'border-[#CCFF00]' : 'border-white/20'
+                    }`} />
+
+                  <div className="flex items-center justify-between mb-3">
                     <p
-                      className={`text-xs tracking-widest ${robotoMono.className} ${event.active ? "text-[#CCFF00]" : "text-white/40"
+                      className={`text-xs tracking-[0.12em] uppercase ${robotoMono.className} ${event.active ? "text-[#CCFF00]" : "text-white/40"
                         }`}
                     >
                       {event.date}
                     </p>
                     <span
-                      className={`text-xs font-bold px-2 py-1 ${robotoMono.className} ${event.active ? "bg-[#CCFF00] text-black" : "bg-white/10 text-white/50"
+                      className={`text-xs font-bold px-3 py-1.5 ${robotoMono.className} transition-all duration-300 ${event.active
+                        ? "bg-gradient-to-br from-[#CCFF00] to-[#99CC00] text-black shadow-[0_0_15px_rgba(204,255,0,0.4)]"
+                        : "bg-white/10 text-white/60"
                         }`}
                     >
                       {event.step}
                     </span>
                   </div>
+
                   <h3
-                    className={`text-lg font-bold mb-1 ${event.active ? "text-[#CCFF00]" : "text-white"}`}
+                    className={`text-lg font-bold mb-2 leading-tight ${event.active
+                      ? "bg-gradient-to-r from-[#CCFF00] to-[#99FF00] bg-clip-text text-transparent"
+                      : "text-white"
+                      }`}
                   >
                     {event.title}
                   </h3>
-                  <p className="text-white/50 text-sm">{event.description}</p>
+
+                  <p className="text-white/60 text-sm leading-relaxed">{event.description}</p>
+
+                  {/* Grid pattern */}
+                  <div
+                    className="absolute inset-0 opacity-[0.02] pointer-events-none"
+                    style={{
+                      backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px), repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.1) 2px, rgba(255,255,255,0.1) 4px)'
+                    }}
+                  />
                 </div>
               </div>
             ))}
