@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { robotoMono } from "@/lib/fonts";
-import { RiFlag2Fill, RiRocket2Fill, RiCalendarEventFill, RiTrophyFill } from "react-icons/ri";
+import { RiUserAddFill, RiCodeSSlashFill, RiMicFill, RiSearchEyeFill, RiPlayFill, RiTrophyFill } from "react-icons/ri";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -13,7 +13,7 @@ const events = [
     title: "Registrations Open",
     date: "Feb 07, 2026 8:00 AM",
     description: "Team registrations begin. Gather your squad and sign up!",
-    icon: RiFlag2Fill,
+    icon: RiUserAddFill,
     step: "01",
     active: true,
   },
@@ -21,7 +21,7 @@ const events = [
     title: "Hack Begins",
     date: "Feb 07, 2026",
     description: "Where the participants start their journey.",
-    icon: RiRocket2Fill,
+    icon: RiCodeSSlashFill,
     step: "02",
     active: false,
   },
@@ -29,7 +29,7 @@ const events = [
     title: "Guest speaker session",
     date: "Feb 07, 2026 11:00 AM",
     description: "An insightful discussion with an industry professional.",
-    icon: RiRocket2Fill,
+    icon: RiMicFill,
     step: "03",
     active: false,
   },
@@ -37,7 +37,7 @@ const events = [
     title: "Review 1",
     date: "Feb 07, 2026 3:00 PM",
     description: "The first review is conducted to evaluate the models.",
-    icon: RiRocket2Fill,
+    icon: RiSearchEyeFill,
     step: "04",
     active: false,
   },
@@ -45,7 +45,7 @@ const events = [
     title: "The hack resumes",
     date: "Feb 07, 2026 9:00 PM",
     description: "The hackathon resumes after a dinner break.",
-    icon: RiCalendarEventFill,
+    icon: RiPlayFill,
     step: "03",
     active: false,
   },
@@ -53,7 +53,7 @@ const events = [
     title: "Review 2",
     date: "Feb 8, 2026 3:00 AM",
     description: "The second review is conducted to evaluate the models.",
-    icon: RiTrophyFill,
+    icon: RiSearchEyeFill,
     step: "04",
     active: false,
   },
