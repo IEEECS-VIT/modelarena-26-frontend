@@ -20,21 +20,36 @@ export default function AboutSection() {
           {/* OBJECTIVE */}
           <div className="panel font-mono text-sm">
             <p className="text-lime-400 mb-3 font-semibold">&gt; OBJECTIVE</p>
-            <p className="text-white/85">&gt; CAT MISSION_CONFIG.YAML</p>
+            <p className="text-white/85">&gt; MISSION_CONFIG.YAML</p>
 
             <div className="space-y-1 text-white/60 mb-4">
-              <p>TARGET_GROUP: <span className="text-white/85">[NEURAL_ARCHITECTS]</span></p>
+              <p>TARGET_GROUP: <span className="text-white/85">[MODEL_GLADIATORS]</span></p>
               <p>DURATION: <span className="text-white/85">86400_SECONDS (24H)</span></p>
-              <p>CONSTRAINTS: <span className="text-white/85">NO_PPT_SLIDES</span></p>
-              <p>MODE: <span className="text-white/85">RAW_COMPUTE // CODE_ONLY</span></p>
+              <p>CONSTRAINTS: <span className="text-white/85">MAX_EFFICIENCY</span></p>
+              <p>MODE: <span className="text-white/85">ALGORITHMIC_WARFARE // STOCHASTIC_OPTIMIZATION</span></p>
               <p>
-                STATUS: <span className="text-lime-400">AWAITING_DEPLOYMENT</span>
+                STATUS: <span className="text-lime-400">ARENA_LIVE</span>
               </p>
             </div>
           </div>
 
           {/* EMPTY VISUAL PANEL */}
-          <div className="panel" />
+
+          <div className="panel font-mono text-sm">
+            <p className="text-lime-400 mb-3 font-semibold">&gt; ARCHITECTURE</p>
+            <p className="text-white/85">&gt; VIEW SYSTEM_TOPOLOGY.GRAPH</p>
+
+            <div className="space-y-1 text-white/60 mb-4">
+              <p>[INPUT_LAYER] ----&gt;<span className="text-white/85">784_NEURONS</span></p>
+              <p>[HIDDEN_STATE_01] :<span className="text-white/85">RELU_ACTIVATED</span></p>
+              <p>[HIDDEN_STATE_02] :<span className="text-white/85">DROPOUT_0.25</span></p>
+              <p>[LATENT_SPACE] :<span className="text-white/85">128_DIMENSIONS</span></p>
+              <p>[OUTPUT_LOGITS] :<span className="text-lime-400">SOFTMAX_FUNCTION</span></p>
+              <p>&gt;OPTIMIZER:<span className="text-lime-400">ADAMW</span></p>
+              <p>&gt;LEARNING_RATE:<span className="text-white/85">3e-4</span></p>
+              <p>&gt;LOSS_FN:<span className="text-white/85">CROSS_ENTROPY</span></p>
+            </div>
+          </div>
 
           {/* SUBMISSION DIRECTORY — FULL WIDTH */}
           <div className="panel font-mono text-sm md:col-span-2">
