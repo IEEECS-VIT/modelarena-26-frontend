@@ -11,6 +11,7 @@ export default function LeaderboardPage() {
     const [teams, setTeams] = useState<Team[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [lastUpdated, setLastUpdated] = useState<string | null>(null);
 
     const { isAuthenticated, isLoading: authLoading, login } = useAuth();
     const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -18,12 +19,15 @@ export default function LeaderboardPage() {
     useEffect(() => {
         if (authLoading) return;
 
+        // AUTH REMOVED: Leaderboard is public now? If so, remove check.
+        // Assuming user still wants it protected based on existing code:
         if (!isAuthenticated) {
             setLoading(false);
             return;
         }
 
-        const fetchLeaderboard = async () => {
+        const fetchLeaderboard = async (isBackground = false) => {
+            if (!isBackground) setLoading(true);
             try {
                 const res = await fetch(`${API_URL}/leaderboard`);
                 if (!res.ok) {
@@ -31,7 +35,15 @@ export default function LeaderboardPage() {
                 }
                 const data = await res.json();
 
-                if (Array.isArray(data)) {
+                // Handle new cached response format from backend
+                if (data.leaderboard && Array.isArray(data.leaderboard)) {
+                    setTeams(data.leaderboard);
+                    if (data.lastUpdated) {
+                        setLastUpdated(new Date(data.lastUpdated).toLocaleTimeString());
+                    }
+                }
+                // Fallback for old format or direct array
+                else if (Array.isArray(data)) {
                     setTeams(data);
                 } else if (Array.isArray(data.data)) {
                     setTeams(data.data);
@@ -41,13 +53,21 @@ export default function LeaderboardPage() {
                 }
             } catch (err) {
                 console.error("Error fetching leaderboard:", err);
-                setError("Failed to load leaderboard data.");
+                if (!isBackground) setError("Failed to load leaderboard data.");
             } finally {
-                setLoading(false);
+                if (!isBackground) setLoading(false);
             }
         };
 
+        // Initial fetch
         fetchLeaderboard();
+
+        // Poll every 5 minutes (300,000 ms) to match backend cron
+        const interval = setInterval(() => {
+            fetchLeaderboard(true);
+        }, 300000);
+
+        return () => clearInterval(interval);
     }, [API_URL, isAuthenticated, authLoading]);
 
     if (authLoading) {
@@ -94,8 +114,15 @@ export default function LeaderboardPage() {
                             <span className="text-lime-400 text-shadow-neon">GLOBAL_NET_STATS</span>
                         </h1>
 
-                        <div className="flex justify-between items-center max-w-4xl mx-auto text-xs md:text-sm font-mono text-gray-400 border-t border-b border-gray-800 py-2 mt-4">
+                        <div className="flex justify-between items-center max-w-4xl mx-auto text-xs md:text-sm font-mono text-gray-400 border-t border-b border-gray-800 py-2 mt-4 space-x-4">
                             <span>[ STATUS=<span className="text-lime-500">LIVE_EVALUATION</span> ]</span>
+
+                            {lastUpdated && (
+                                <span className="text-gray-500 hidden md:inline">
+                                    [ LAST_UPDATED: <span className="text-lime-300">{lastUpdated}</span> ]
+                                </span>
+                            )}
+
                             <div className="flex items-center">
                                 <span>TOTAL_CLUSTERS= {teams.length}</span>
                                 <div className={`w-2 h-2 ${loading ? 'bg-yellow-500' : 'bg-lime-500'} rounded-full ml-2 animate-pulse`}></div>
