@@ -17,6 +17,8 @@ export default function Navbar() {
       setActive("home");
     } else if (pathname.includes("dashboard")) {
       setActive("dashboard");
+    } else if (pathname.includes("leaderboard")) {
+      setActive("leaderboard");
     } else {
       setActive("");
     }
@@ -118,6 +120,22 @@ export default function Navbar() {
             >
               DASHBOARD
               {pathname === "/dashboard" && (
+                <span className="absolute -bottom-2 left-0 h-1 w-full bg-[#CCFF00] rounded" />
+              )}
+            </button>
+          )}
+
+          {isAuthenticated && (
+            <button
+              onClick={() => {
+                if (pathname === '/leaderboard') return;
+                window.location.href = "/leaderboard";
+              }}
+              className={`relative text-sm md:text-base tracking-wide md:tracking-wider px-2 md:px-3 py-1 font-medium transition ${pathname === "/leaderboard" ? "text-[#CCFF00]" : "text-white/80 hover:text-white"
+                }`}
+            >
+              LEADERBOARD
+              {pathname === "/leaderboard" && (
                 <span className="absolute -bottom-2 left-0 h-1 w-full bg-[#CCFF00] rounded" />
               )}
             </button>
@@ -232,6 +250,21 @@ export default function Navbar() {
               className={`text-lg font-bold tracking-widest hover:text-[#CCFF00] transition-colors ${pathname === "/dashboard" ? "text-[#CCFF00]" : "text-white"}`}
             >
               DASHBOARD
+            </button>
+          )}
+
+          {isAuthenticated && (
+            <button
+              onClick={() => {
+                if (pathname === '/leaderboard') {
+                  setIsMenuOpen(false);
+                  return;
+                }
+                window.location.href = "/leaderboard";
+              }}
+              className={`text-lg font-bold tracking-widest hover:text-[#CCFF00] transition-colors ${pathname === "/leaderboard" ? "text-[#CCFF00]" : "text-white"}`}
+            >
+              LEADERBOARD
             </button>
           )}
 

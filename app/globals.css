@@ -1,13 +1,17 @@
 @import "tailwindcss";
 
-html, body, #__next {
+html,
+body,
+#__next {
 	height: 100%;
 }
+
 body {
 	position: relative;
 	min-height: 100%;
 	background-color: var(--bg-color, #0b0b0b);
-	color: #ffffff; /* default text color set to white */
+	color: #ffffff;
+	/* default text color set to white */
 }
 
 /* Use a fixed pseudo-element so we can control opacity/blur separately */
@@ -20,19 +24,45 @@ body::before {
 	background-position: center;
 	background-repeat: no-repeat;
 	background-attachment: fixed;
-	opacity: 0.45; /* lower this to hide more noise */
+	opacity: 0.45;
+	/* lower this to hide more noise */
 	filter: blur(1.2px) saturate(0.8) contrast(0.95);
 	z-index: -1;
 	pointer-events: none;
 }
 
 /* Ensure content sits above the background */
-main, #__next > div {
+main,
+#__next>div {
 	position: relative;
 }
 
 /* Optional: provide a subtle overlay class if pages need higher contrast */
- /* .bg-overlay {
+/* .bg-overlay {
 	background-color: rgba(254, 12, 12, 0.35);
 } */
 
+
+@layer utilities {
+	.text-shadow-neon {
+		text-shadow: 0 0 5px rgba(132, 204, 22, 0.5), 0 0 10px rgba(132, 204, 22, 0.3);
+	}
+
+	.custom-scrollbar::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
+
+	.custom-scrollbar::-webkit-scrollbar-track {
+		background: #1a1a1a;
+	}
+
+	.custom-scrollbar::-webkit-scrollbar-thumb {
+		background: #333;
+		border-radius: 3px;
+	}
+
+	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: #444;
+	}
+}

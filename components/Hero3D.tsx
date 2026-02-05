@@ -235,6 +235,10 @@ export default function Hero3D() {
   }, []);
 
   // Reset error boundary periodically to recover from WebGL context loss
+  // Reset error boundary periodically to recover from WebGL context loss
+  // REMOVED: Aggressive reset on visibility change caused random disappearances.
+  // Instead we rely on standard WebGL context restoration events handled below.
+  /*
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
@@ -245,6 +249,7 @@ export default function Hero3D() {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
+  */
 
   // Handle WebGL context loss/restore
   const handleCreated = ({ gl }: { gl: THREE.WebGLRenderer }) => {
