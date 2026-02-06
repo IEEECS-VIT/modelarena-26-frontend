@@ -33,7 +33,7 @@ export default function AboutSection() {
             </div>
           </div>
 
-          {/* EMPTY VISUAL PANEL */}
+          {/* ARCHITECTURE */}
 
           <div className="panel font-mono text-sm">
             <p className="text-lime-400 mb-3 font-semibold">&gt; ARCHITECTURE</p>
@@ -45,9 +45,7 @@ export default function AboutSection() {
               <p>[HIDDEN_STATE_02] :<span className="text-white/85">DROPOUT_0.25</span></p>
               <p>[LATENT_SPACE] :<span className="text-white/85">128_DIMENSIONS</span></p>
               <p>[OUTPUT_LOGITS] :<span className="text-lime-400">SOFTMAX_FUNCTION</span></p>
-              <p>&gt;OPTIMIZER:<span className="text-lime-400">ADAMW</span></p>
-              <p>&gt;LEARNING_RATE:<span className="text-white/85">3e-4</span></p>
-              <p>&gt;LOSS_FN:<span className="text-white/85">CROSS_ENTROPY</span></p>
+              
             </div>
           </div>
 
