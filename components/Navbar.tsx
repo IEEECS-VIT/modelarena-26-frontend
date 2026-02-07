@@ -125,6 +125,7 @@ export default function Navbar() {
             </button>
           )}
 
+          {/* COMMENTED OUT: Leaderboard display disabled
           {isAuthenticated && (
             <button
               onClick={() => {
@@ -140,6 +141,7 @@ export default function Navbar() {
               )}
             </button>
           )}
+          */
 
           <button
             onClick={() => scrollTo("timeline")}
@@ -253,6 +255,7 @@ export default function Navbar() {
             </button>
           )}
 
+          {/* COMMENTED OUT: Leaderboard display disabled
           {isAuthenticated && (
             <button
               onClick={() => {
@@ -267,6 +270,7 @@ export default function Navbar() {
               LEADERBOARD
             </button>
           )}
+          */
 
           <button
             onClick={() => scrollTo("timeline")}
