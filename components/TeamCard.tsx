@@ -161,21 +161,21 @@ export default function TeamCard({ team, onLeave }: TeamCardProps) {
           <h3 className="text-white/70 text-sm mb-4 tracking-widest">Action Console</h3>
 
           <div className="flex flex-wrap gap-4">
-            {/* <Link
+            <Link
               href="/submit"
               className="bg-[#CCFF00] text-black px-6 py-3 rounded font-semibold tracking-widest hover:bg-[#b8e600] transition"
             >
               [LOCK_TEAM_&_SUBMIT]
-            </Link> */}
+            </Link>
 
-            <Link
+            {/* <Link
               href="https://drive.google.com/file/d/1nmqC3qS1EeOQeLNK5GZv3qiUaCBjT4Gu/view?usp=sharing"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#CCFF00] text-black px-6 py-3 rounded font-semibold tracking-widest hover:bg-[#b8e600] transition"
             >
               [DATASET_LINK]
-            </Link>
+            </Link> */}
 
             <button
               onClick={onLeave}
