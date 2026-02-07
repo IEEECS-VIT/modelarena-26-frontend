@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -141,7 +142,7 @@ export default function Navbar() {
               )}
             </button>
           )}
-          */
+          */}
 
           <button
             onClick={() => scrollTo("timeline")}
@@ -270,7 +271,7 @@ export default function Navbar() {
               LEADERBOARD
             </button>
           )}
-          */
+          */}
 
           <button
             onClick={() => scrollTo("timeline")}
