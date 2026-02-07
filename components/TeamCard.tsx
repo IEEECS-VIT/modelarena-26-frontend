@@ -168,6 +168,15 @@ export default function TeamCard({ team, onLeave }: TeamCardProps) {
               [LOCK_TEAM_&_SUBMIT]
             </Link> */}
 
+            <Link
+              href="https://drive.google.com/file/d/1nmqC3qS1EeOQeLNK5GZv3qiUaCBjT4Gu/view?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#CCFF00] text-black px-6 py-3 rounded font-semibold tracking-widest hover:bg-[#b8e600] transition"
+            >
+              [DATASET_LINK]
+            </Link>
+
             <button
               onClick={onLeave}
               className="text-red-500 px-6 py-3 tracking-widest hover:text-red-400 transition"
